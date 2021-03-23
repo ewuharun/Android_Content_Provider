@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+
+<class>
+
+    <services
+        service="truckSize"
+        unique_column="column_id"
+        update_column="is_synced"
+        table_name="tbl_testdata"
+        http_method="2"
+        url="/mobile_api/api/Merchandising/test">
+    </services>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</class>

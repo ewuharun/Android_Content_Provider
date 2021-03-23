@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+
+<class>
+
+    <services
+        service="truckSize"
+        unique_column="column_id"
+        http_method="2"
+        url="/mobile_api/api/TruckSize/getTruckSizeNew"
+        where_condition="">
+    </services>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</class>

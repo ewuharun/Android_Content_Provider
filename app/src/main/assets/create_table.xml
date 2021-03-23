@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<class>
+
+
+    <table tablename="tbld_truck_size_new">
+        <col_name type="INTEGER" index="PRIMARY KEY" prop="AUTOINCREMENT">id</col_name>
+        <col_name type="INTEGER">column_id</col_name>
+        <col_name type="TEXT">name</col_name>
+    </table>
+
+
+    <table tablename="tbl_testdata">
+        <col_name type="INTEGER" index="PRIMARY KEY" prop="AUTOINCREMENT">id</col_name>
+        <col_name type="TEXT">name</col_name>
+        <col_name type="INTEGER">age</col_name>
+        <col_name type="TEXT">phone</col_name>
+        <col_name type="TEXT">email</col_name>
+        <col_name type="INTEGER">column_id</col_name>
+        <col_name type="INTEGER">is_synced</col_name>
+    </table>
+
+
+</class>
