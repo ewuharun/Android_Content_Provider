@@ -66,8 +66,13 @@ public class DataDownWorker extends Worker {
 
         //ArrayList of all String which is coming back from DataDown Service from
         //all api
+     
+
+
+        int startTime= (int) System.currentTimeMillis();
         allData=downloadAllTableDataFromServer();
-        Log.e("alldata",allData.toString());
+        int totalTimeRequired= (int) (System.currentTimeMillis()-startTime);
+        Log.e("TotalTimeRequired",String.valueOf(totalTimeRequired));
 
         //allData will be passed by this Data class in the main view
         Data data=new Data.Builder()
