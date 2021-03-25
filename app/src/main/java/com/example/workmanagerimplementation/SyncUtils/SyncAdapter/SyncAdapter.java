@@ -49,8 +49,10 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
+        int startTime= (int) System.currentTimeMillis();
         allData=downloadAllTableDataFromServer();
-        Log.e("alldata",allData.toString());
+        int totalTimeRequired= (int) (System.currentTimeMillis()-startTime);
+        Log.e("TotalTimeRequired",String.valueOf(totalTimeRequired));
     }
 
 
