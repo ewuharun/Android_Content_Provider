@@ -2,18 +2,16 @@
 
 <class>
 
+
+
+
     <services
-        service="truckSize"
-        unique_column="column_id"
+        service="TBL_TODAYS_MIS_MERCHANDISING_FILTER_DATA"
+        unique_column="sales_order_id"
         http_method="2"
-        url="/mobile_api/api/TruckSize/getTruckSizeNew"
+        url="/mobile_api/api/Merchandising/harunvaitest"
         where_condition="">
     </services>
-
-
-
-
-
 
 
 

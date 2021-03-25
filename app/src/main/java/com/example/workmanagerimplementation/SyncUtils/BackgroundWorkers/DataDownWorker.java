@@ -22,17 +22,19 @@ import com.example.workmanagerimplementation.SyncUtils.HelperUtils.JsonParser;
 import com.example.workmanagerimplementation.SyncUtils.HelperUtils.NetworkStream;
 import com.example.workmanagerimplementation.SyncUtils.HelperUtils.DataSync;
 import com.example.workmanagerimplementation.data.DataContract;
+import com.google.android.material.badge.BadgeDrawable;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.TimeZone;
 
 /**
  * Created by Md.harun or rashid on 21,March,2021
  * BABL, Bangladesh,
  */
 public class DataDownWorker extends Worker {
-
 
     //Instance Variable Declaration
     private Context mContext;
@@ -59,6 +61,7 @@ public class DataDownWorker extends Worker {
         //getting the input data
         String taskDesc=getInputData().getString(TASK_DESC);
 
+        //Notification show while apps run in the background
         displayNotification("Worker",taskDesc);
 
         //ArrayList of all String which is coming back from DataDown Service from
@@ -68,11 +71,11 @@ public class DataDownWorker extends Worker {
 
         //allData will be passed by this Data class in the main view
         Data data=new Data.Builder()
-                .putString(TASK_DESC,allData.toString())
+                .putString(TASK_DESC,String.valueOf(new Date().getTime()))
                 .build();
 
         //Return Back the success status with data
-        return Result.success(data);
+        return Result.success();
     }
 
 
@@ -124,9 +127,12 @@ public class DataDownWorker extends Worker {
                 //url by making the url complete and we use here NetworkStream Class for
                 //downloading the data
                 String resultData = new NetworkStream().getStream(applicationUrl + dataRule.getServiceUrl(), 2, null);
-                Log.e("resultData",resultData);
+                Log.e("resultDataDown",resultData);
+
                 ArrayList<String> allTableNameList= JsonParser.ifValidJsonGetTable(resultData);
+
                 Log.e("allTable",allTableNameList.toString());
+
                 if(allTableNameList!=null){
                     for(String tableName : allTableNameList){
                         Log.e("tableName",tableName);
@@ -145,6 +151,7 @@ public class DataDownWorker extends Worker {
                         for (String key : resultContentValuesList.keySet()) {
                             if (!tableData.containsKey(key)) {
                                 ContentValues value = resultContentValuesList.get(key);
+
                                 Uri insertUri = contentResolver.insert(uri, value);
                                 Log.d(tableName, insertUri.getPath());
                             } else {
@@ -157,6 +164,7 @@ public class DataDownWorker extends Worker {
                 allData.add(resultData+"\n\n");
             }
         }
+        //Log.e("allData",new Gson().toJson(allData));
         return allData;
     }
 

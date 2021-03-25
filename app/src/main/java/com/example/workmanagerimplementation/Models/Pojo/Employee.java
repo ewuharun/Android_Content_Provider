@@ -17,6 +17,15 @@ public class Employee {
         this.column_id = column_id;
     }
 
+    public Employee(String name, int age, String phone, String email,int column_id,int is_synced) {
+        this.name = name;
+        this.age = age;
+        this.phone = phone;
+        this.email = email;
+        this.column_id=column_id;
+        this.is_synced=is_synced;
+    }
+
     public Employee(String name, int age, String phone, String email,int is_synced) {
         this.name = name;
         this.age = age;
@@ -24,6 +33,7 @@ public class Employee {
         this.email = email;
         this.is_synced=is_synced;
     }
+
 
     public int getIs_synced() {
         return is_synced;

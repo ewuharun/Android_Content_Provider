@@ -23,8 +23,9 @@ import java.util.List;
 public class NetworkStream {
     //Constructor for NetworkStream
     public NetworkStream(){
-
     }
+
+
     //This getStream is responsible for getting Data from the api
     //it takes 3 arguments which is fed into the method
     //it return back a response which is a string

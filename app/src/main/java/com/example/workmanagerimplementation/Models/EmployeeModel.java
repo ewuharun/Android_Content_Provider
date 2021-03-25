@@ -23,7 +23,7 @@ public class EmployeeModel {
         this.contentResolver=contentResolver;
     }
 
-    public void insertEmployee(Employee employee){
+    public String insertEmployee(Employee employee){
 
         ContentValues values=new ContentValues();
 
@@ -31,9 +31,12 @@ public class EmployeeModel {
         values.put(DataContract.EmployeeEntry.AGE,employee.getAge());
         values.put(DataContract.EmployeeEntry.PHONE,employee.getPhone());
         values.put(DataContract.EmployeeEntry.EMAIL,employee.getEmail());
+        values.put(DataContract.EmployeeEntry.COLUMN_ID,employee.getColumn_id());
         values.put(DataContract.EmployeeEntry.IS_SYNCED,employee.getIs_synced());
 
         contentResolver.insert(DataContract.EmployeeEntry.CONTENT_URI,values);
+        return employee.getName();
+
     }
 
     public ArrayList<Employee> getEmployeeList(){

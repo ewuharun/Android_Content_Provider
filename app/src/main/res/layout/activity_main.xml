@@ -36,7 +36,17 @@
         android:layout_height="wrap_content"
         android:text="Submit"
         android:id="@+id/startWorkBtn"/>
-
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:text="oneTimeWorkReq"
+        android:id="@+id/oneTimeWorkBtn"/>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/logoutBtn"
+        android:text="Logout"/>
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -44,7 +54,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="work"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:id="@+id/workStatusTv"/>
     </ScrollView>
 

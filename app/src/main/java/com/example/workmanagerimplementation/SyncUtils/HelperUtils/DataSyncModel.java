@@ -64,9 +64,6 @@ public class DataSyncModel {
         Log.e("Data",new Gson().toJson(data));
         return data;
     }
-
-
-
     public void updateSynced(Uri uri, String dataResult, DataSync dataSync) {
         ContentValues values = new ContentValues();
         values.put(dataSync.getUpdateColumn(), 1);

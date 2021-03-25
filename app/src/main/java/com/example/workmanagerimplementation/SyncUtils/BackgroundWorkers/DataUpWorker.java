@@ -19,6 +19,7 @@ import com.example.workmanagerimplementation.SyncUtils.HelperUtils.JsonParser;
 import com.example.workmanagerimplementation.SyncUtils.HelperUtils.Maths;
 import com.example.workmanagerimplementation.SyncUtils.HelperUtils.NetworkStream;
 import com.example.workmanagerimplementation.data.DataContract;
+import com.google.gson.Gson;
 
 import org.apache.http.NameValuePair;
 
@@ -56,6 +57,7 @@ public class DataUpWorker extends Worker {
 
 
         uploadAllDataIntoTheServer();
+        Log.e("Datauploaded",new Gson().toJson(data));
 
 
 
@@ -96,7 +98,9 @@ public class DataUpWorker extends Worker {
                     String columnId = JsonParser.ifValidJSONGetColumnId(dataPut);
                     Log.e("RequestResult", dataPut);
 
+
                     if (columnId != null) {
+                        Log.e("column_id",columnId);
                         dataSyncModel.updateSynced(uri, columnId, dataSync);
                     }
 

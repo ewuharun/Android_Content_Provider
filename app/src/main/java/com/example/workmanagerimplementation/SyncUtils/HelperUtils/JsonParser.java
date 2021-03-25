@@ -58,7 +58,7 @@ public class JsonParser {
                 for (int i = 0; i < dataArray.length(); ++i) {
                     JSONObject dataRows = dataArray.getJSONObject(i);
                     Iterator iterator = dataRows.keys();
-                    String column_id = dataArray.getJSONObject(i).getString("column_id");
+                    String column_id = dataArray.getJSONObject(i).getString("sales_order_id");
 
                     ContentValues mNewValues = new ContentValues();
                     for (int k = 0; iterator.hasNext(); k++) {
