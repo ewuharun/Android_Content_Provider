@@ -1,89 +1,81 @@
 package com.example.workmanagerimplementation.Models.Pojo;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
-
 /**
  * Created by Md.harun or rashid on 24,March,2021
  * BABL, Bangladesh,
  */
 public class Sales {
-    @SerializedName("sales_order_id")
-    @Expose
-    private int salesOrderId;
-    @SerializedName("so_oracle_id")
-    @Expose
-    private String soOracleId;
-    @SerializedName("dealer_name")
-    @Expose
-    private String dealerName;
-    @SerializedName("name")
-    @Expose
+    private int sales_order_id;
+    private String so_oracle_id;
+    private String dealer_name;
     private String name;
-    @SerializedName("order_date")
-    @Expose
-    private String orderDate;
-    @SerializedName("order_date_time")
-    @Expose
-    private String orderDateTime;
-    @SerializedName("delivery_date")
-    @Expose
-    private String deliveryDate;
+    private String order_date;
+    private String order_date_time;
+    private String delivery_date;
 
-    public int getSalesOrderId() {
-        return salesOrderId;
+    public Sales(int sales_order_id, String so_oracle_id, String dealer_name, String name, String order_date, String order_date_time, String delivery_date) {
+        this.sales_order_id = sales_order_id;
+        this.so_oracle_id = so_oracle_id;
+        this.dealer_name = dealer_name;
+        this.name = name;
+        this.order_date = order_date;
+        this.order_date_time = order_date_time;
+        this.delivery_date = delivery_date;
     }
 
-    public void setSalesOrderId(int salesOrderId) {
-        this.salesOrderId = salesOrderId;
+    public void setSales_order_id(int sales_order_id) {
+        this.sales_order_id = sales_order_id;
     }
 
-    public String getSoOracleId() {
-        return soOracleId;
+    public void setSo_oracle_id(String so_oracle_id) {
+        this.so_oracle_id = so_oracle_id;
     }
 
-    public void setSoOracleId(String soOracleId) {
-        this.soOracleId = soOracleId;
-    }
-
-    public String getDealerName() {
-        return dealerName;
-    }
-
-    public void setDealerName(String dealerName) {
-        this.dealerName = dealerName;
-    }
-
-    public String getName() {
-        return name;
+    public void setDealer_name(String dealer_name) {
+        this.dealer_name = dealer_name;
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
-    public String getOrderDate() {
-        return orderDate;
+    public void setOrder_date(String order_date) {
+        this.order_date = order_date;
     }
 
-    public void setOrderDate(String orderDate) {
-        this.orderDate = orderDate;
+    public void setOrder_date_time(String order_date_time) {
+        this.order_date_time = order_date_time;
     }
 
-    public String getOrderDateTime() {
-        return orderDateTime;
+    public void setDelivery_date(String delivery_date) {
+        this.delivery_date = delivery_date;
     }
 
-    public void setOrderDateTime(String orderDateTime) {
-        this.orderDateTime = orderDateTime;
+    public int getSales_order_id() {
+        return sales_order_id;
     }
 
-    public String getDeliveryDate() {
-        return deliveryDate;
+    public String getSo_oracle_id() {
+        return so_oracle_id;
     }
 
-    public void setDeliveryDate(String deliveryDate) {
-        this.deliveryDate = deliveryDate;
+    public String getDealer_name() {
+        return dealer_name;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public String getOrder_date() {
+        return order_date;
+    }
+
+    public String getOrder_date_time() {
+        return order_date_time;
+    }
+
+    public String getDelivery_date() {
+        return delivery_date;
+    }
 }

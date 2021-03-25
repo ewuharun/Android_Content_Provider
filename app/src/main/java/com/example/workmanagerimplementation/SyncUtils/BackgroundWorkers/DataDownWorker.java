@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Md.harun or rashid on 21,March,2021
@@ -66,13 +67,24 @@ public class DataDownWorker extends Worker {
 
         //ArrayList of all String which is coming back from DataDown Service from
         //all api
-     
+
 
 
         int startTime= (int) System.currentTimeMillis();
+
         allData=downloadAllTableDataFromServer();
+
         int totalTimeRequired= (int) (System.currentTimeMillis()-startTime);
-        Log.e("TotalTimeRequired",String.valueOf(totalTimeRequired));
+
+        //hh:mm:ss
+        String time=String.format("%02d:%02d:%02d",
+                TimeUnit.MILLISECONDS.toHours(totalTimeRequired),
+                TimeUnit.MILLISECONDS.toMinutes(totalTimeRequired) -
+                        TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(totalTimeRequired)),
+                TimeUnit.MILLISECONDS.toSeconds(totalTimeRequired) -
+                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(totalTimeRequired)));
+
+        Log.e("TotalTimeRequired",time);
 
         //allData will be passed by this Data class in the main view
         Data data=new Data.Builder()
