@@ -4,11 +4,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
-import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.annotation.SuppressLint;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -20,31 +23,36 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.workmanagerimplementation.Models.EmployeeModel;
-import com.example.workmanagerimplementation.Models.Pojo.Employee;
-import com.example.workmanagerimplementation.Models.Pojo.Sales;
-import com.example.workmanagerimplementation.Models.SalesModel;
 import com.example.workmanagerimplementation.R;
-import com.example.workmanagerimplementation.SyncUtils.BackgroundWorkers.DataDownWorker;
-import com.example.workmanagerimplementation.SyncUtils.BackgroundWorkers.DataUpWorker;
+import com.example.workmanagerimplementation.SyncUtils.SyncAdapter.SyncUtils;
 import com.example.workmanagerimplementation.data.DBHandler;
-import com.google.android.material.timepicker.TimeFormat;
-import com.google.gson.Gson;
+import com.example.workmanagerimplementation.data.DataContract;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
-    private Button startTaskBtn,oneTimeWorkReqBtn,logoutBtn;
+    private Button startTaskBtn, oneTimeWorkReqBtn, logoutBtn;
     private TextView workStatusTv;
-    private EditText nameEt,ageEt,phoneEt,emailEt;
+    private EditText nameEt, ageEt, phoneEt, emailEt;
     private DBHandler dbHandler;
     private SQLiteDatabase db;
     private ContentResolver contentResolver;
     private EmployeeModel employeeModel;
 
-    private String name,phone,email;
+    private String name, phone, email;
     private int age;
+
+
+    // Constants
+    // The authority for the sync adapter's content provider
+    public static final String AUTHORITY = DataContract.CONTENT_AUTHORITY;
+    // An account type, in the form of a domain name
+    public static final String ACCOUNT_TYPE = "com.example.workmanagerimplementation";
+    // The account name
+    public static final String ACCOUNT = "placeholderaccount";
+    // Instance fields
+    Account mAccount;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,12 +62,10 @@ public class MainActivity extends AppCompatActivity {
         //initialize the Variables of the activity_main layout
         initVariables();
 
+
+        SyncUtils.createSyncAccount(this);
+
         //employeeModel=new EmployeeModel(getContentResolver());
-
-
-
-
-
 
 
         //workStatusTv.setText(new Gson().toJson(trucks));
@@ -75,10 +81,6 @@ public class MainActivity extends AppCompatActivity {
 //        Data data=new Data.Builder()
 //                .putString(DataUpWorker.TASK_DESC,"The task data passed from main activity")
 //                .build();
-        Data dataDown=new Data.Builder()
-                .putString(DataDownWorker.TASK_DESC,String.valueOf(new Date().getTime()))
-                .build();
-
 
 
 
@@ -86,10 +88,7 @@ public class MainActivity extends AppCompatActivity {
 //        final PeriodicWorkRequest workRequest=new PeriodicWorkRequest.Builder(DataUpWorker.class,16, TimeUnit.MINUTES).build();
 
         //this is the subclass of work request
-        final OneTimeWorkRequest workRequest1=new OneTimeWorkRequest.Builder(DataDownWorker.class)
-                .setInputData(dataDown)
-                //.setConstraints(constraints)
-                .build();
+
 
 
         //WorkManager.getInstance().enqueue(workRequest1);
@@ -98,35 +97,18 @@ public class MainActivity extends AppCompatActivity {
         //employeeModel.getEmployeeList();
 
 
-
         //WorkManager.getInstance().cancelWorkById(workRequest.getId());
 
         //Log.e("employee",new Gson().toJson(employeeModel.getEmployeeList()));
 
         //while clicking on the startTaskBtn
-        startTaskBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                name=nameEt.getText().toString().trim();
-                age=Integer.valueOf(ageEt.getText().toString().trim());
-                phone=phoneEt.getText().toString().trim();
-                email=emailEt.getText().toString().trim();
 
-                //Employee employee=new Employee(name,age,phone,email,0,0);
-
-
-                //String isInserted=employeeModel.insertEmployee(employee);
-                //Toast.makeText(MainActivity.this, isInserted, Toast.LENGTH_SHORT).show();
-
-
-            }
-        });
 
 
         logoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent(MainActivity.this,LoginActivity.class);
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(intent);
                 finish();
             }
@@ -137,63 +119,78 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Log.e("StartTime",String.valueOf(new Date().getTime()));
+//                Log.e("StartTime", String.valueOf(new Date().getTime()));
+//
+//                WorkManager.getInstance().enqueue(workRequest1);
+//
+//                ArrayList<Sales> sales = new ArrayList<>();
+//                SalesModel salesModel = new SalesModel(getContentResolver());
+//                sales = salesModel.salesOrder();
+//
+//                Log.e("sizeData", String.valueOf(sales.size()));
+//
+//                Log.e("dataDown", new Gson().toJson(sales));
 
-                WorkManager.getInstance().enqueue(workRequest1);
 
-                ArrayList<Sales> sales=new ArrayList<>();
-                SalesModel salesModel=new SalesModel(getContentResolver());
-                sales=salesModel.salesOrder();
 
-                Log.e("sizeData", String.valueOf(sales.size()));
 
-                Log.e("dataDown",new Gson().toJson(sales));
+                SyncUtils.forceRefreshAll(MainActivity.this);
+                Toast.makeText(MainActivity.this, "Now check logcat", Toast.LENGTH_SHORT)
+                        .show();
             }
         });
 
 
 
 
-        //observ the status of the background work done by WorkManager
-        WorkManager.getInstance().getWorkInfoByIdLiveData(workRequest1.getId())
-                .observe(MainActivity.this, new Observer<WorkInfo>() {
-                    @Override
-                    public void onChanged(WorkInfo workInfo) {
-
-                        if(workInfo.getState()==WorkInfo.State.RUNNING){
-                            Toast.makeText(MainActivity.this, "Running", Toast.LENGTH_SHORT).show();
-                        }
-                        if (workInfo.getState()==WorkInfo.State.SUCCEEDED){
-                            Log.e("EndTime",String.valueOf(new Date().getTime()));
-                        }
-
-                        workStatusTv.setText(workInfo.getState().name()+"\n");
-
-                        //Receiving the Data Back
-                        if(workInfo!=null && workInfo.getState().isFinished()){
-
-                            //workStatusTv.setText(workInfo.getOutputData().getString(DataDownWorker.TASK_DESC));
-                            //Log.e("none",workInfo.getOutputData().getString(DataUpWorker.TASK_DESC));
-                        }
-
-                    }
-                });
     }
 
 
     private void initVariables() {
-        startTaskBtn=findViewById(R.id.startWorkBtn);
-        oneTimeWorkReqBtn=findViewById(R.id.oneTimeWorkBtn);
-        workStatusTv=findViewById(R.id.workStatusTv);
-        dbHandler=new DBHandler(getApplicationContext());
+        startTaskBtn = findViewById(R.id.startWorkBtn);
+        oneTimeWorkReqBtn = findViewById(R.id.oneTimeWorkBtn);
+        workStatusTv = findViewById(R.id.workStatusTv);
+        dbHandler = new DBHandler(getApplicationContext());
 
-        nameEt=findViewById(R.id.nameEt);
-        ageEt=findViewById(R.id.ageEt);
-        phoneEt=findViewById(R.id.phoneEt);
-        emailEt=findViewById(R.id.emailEt);
+        nameEt = findViewById(R.id.nameEt);
+        ageEt = findViewById(R.id.ageEt);
+        phoneEt = findViewById(R.id.phoneEt);
+        emailEt = findViewById(R.id.emailEt);
 
-        logoutBtn=findViewById(R.id.logoutBtn);
+        logoutBtn = findViewById(R.id.logoutBtn);
     }
 
 
+
+
+
+    @SuppressLint("MissingPermission")
+    public static Account CreateSyncAccount(Context context) {
+        // Create the account type and default account
+        Account newAccount = new Account(ACCOUNT, ACCOUNT_TYPE);
+        // Get an instance of the Android account manager
+        AccountManager accountManager = (AccountManager) context.getSystemService(ACCOUNT_SERVICE);
+        if (accountManager.addAccountExplicitly(newAccount, null, null)) {
+            /*
+             * If you don't set android:syncable="true" in
+             * in your <provider> element in the manifest,
+             * then call context.setIsSyncable(account, AUTHORITY, 1)
+             * here.
+             */
+
+        } else {
+            /*
+             * The account exists or some other error occurred. Log this, report it,
+             * or handle it internally.
+             */
+        }
+
+       return null;
+    }
+
+
+
+
+
 }
+

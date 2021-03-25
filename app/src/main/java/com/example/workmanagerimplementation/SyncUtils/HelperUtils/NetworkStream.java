@@ -1,5 +1,12 @@
 package com.example.workmanagerimplementation.SyncUtils.HelperUtils;
 
+import android.util.Log;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.workmanagerimplementation.Models.Pojo.Sales;
+import com.google.gson.Gson;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -15,6 +22,9 @@ import org.apache.http.util.EntityUtils;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
 
 /**
  * Created by Md.harun or rashid on 21,March,2021
@@ -35,13 +45,20 @@ public class NetworkStream {
             DefaultHttpClient e=new DefaultHttpClient();
             HttpEntity httpEntity = null;
             HttpResponse httpResponse = null;
+
+
+
+
+
             if(method == 2) {
+
                 HttpPost httpGet = new HttpPost(url);
                 if(params != null) {
                     httpGet.setEntity(new UrlEncodedFormEntity(params));
                 }
 
                 httpResponse = e.execute(httpGet);
+
             } else if(method == 1) {
                 if(params != null) {
                     String httpGet1 = URLEncodedUtils.format(params, "utf-8");
@@ -69,6 +86,4 @@ public class NetworkStream {
         }
         return response;
     }
-
-
 }

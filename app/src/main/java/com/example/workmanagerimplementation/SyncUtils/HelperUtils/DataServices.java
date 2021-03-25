@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.util.Log;
 
-import com.example.workmanagerimplementation.SyncUtils.BackgroundWorkers.DataDownWorker;
 import com.google.gson.Gson;
 
 import org.w3c.dom.Document;
@@ -27,7 +26,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 public class DataServices {
     private Context mContext;
 
-    private DataDownWorker dataDownWorker;
+
 
     public DataServices(Context context){
         this.mContext=context;

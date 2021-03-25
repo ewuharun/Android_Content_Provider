@@ -1,119 +1,67 @@
-package com.example.workmanagerimplementation.SyncUtils.BackgroundWorkers;
+package com.example.workmanagerimplementation.SyncUtils.SyncAdapter;
 
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
+import android.accounts.Account;
+import android.content.AbstractThreadedSyncAdapter;
+import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SyncResult;
 import android.net.Uri;
-import android.os.Build;
+import android.os.Bundle;
 import android.util.Log;
-
-import androidx.annotation.NonNull;
-import androidx.core.app.NotificationCompat;
-import androidx.work.Data;
-import androidx.work.Worker;
-import androidx.work.WorkerParameters;
 
 import com.example.workmanagerimplementation.R;
 import com.example.workmanagerimplementation.SyncUtils.HelperUtils.DataServices;
+import com.example.workmanagerimplementation.SyncUtils.HelperUtils.DataSync;
 import com.example.workmanagerimplementation.SyncUtils.HelperUtils.DataSyncModel;
 import com.example.workmanagerimplementation.SyncUtils.HelperUtils.JsonParser;
 import com.example.workmanagerimplementation.SyncUtils.HelperUtils.NetworkStream;
-import com.example.workmanagerimplementation.SyncUtils.HelperUtils.DataSync;
 import com.example.workmanagerimplementation.data.DataContract;
-import com.google.android.material.badge.BadgeDrawable;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.TimeZone;
+
+import static android.content.ContentValues.TAG;
 
 /**
- * Created by Md.harun or rashid on 21,March,2021
+ * Created by Md.harun or rashid on 25,March,2021
  * BABL, Bangladesh,
  */
-public class DataDownWorker extends Worker {
+public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
-    //Instance Variable Declaration
-    private Context mContext;
     private ContentResolver contentResolver;
-    private DataServices dataServices;
     private ArrayList<String> allData;
+    private DataServices dataServices;
+    private Context mContext;
 
-    //a public static string that will be used as the key
-    //for sending and receiving data
-    public static final String TASK_DESC="task_desc";
 
-    //Constructor for DataDownWorker Class
-    public DataDownWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
-        super(context, workerParams);
+    public SyncAdapter(Context context, boolean autoInitialize) {
+        super(context, autoInitialize);
         this.contentResolver=context.getContentResolver();
     }
 
-    /*This doWork Method is responsible for doing the work in the
-    background and here we download the data from the server*/
-    @NonNull
+    public SyncAdapter(Context context, boolean autoInitialize, boolean allowParallelSyncs) {
+        super(context, autoInitialize, allowParallelSyncs);
+        this.contentResolver=context.getContentResolver();
+    }
+
     @Override
-    public Result doWork() {
-
-        //getting the input data
-        String taskDesc=getInputData().getString(TASK_DESC);
-
-        //Notification show while apps run in the background
-        displayNotification("Worker",taskDesc);
-
-        //ArrayList of all String which is coming back from DataDown Service from
-        //all api
+    public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
         allData=downloadAllTableDataFromServer();
         Log.e("alldata",allData.toString());
-
-        //allData will be passed by this Data class in the main view
-        Data data=new Data.Builder()
-                .putString(TASK_DESC,String.valueOf(new Date().getTime()))
-                .build();
-
-        //Return Back the success status with data
-        return Result.success();
     }
 
 
-    /*Displaying a simple notification while task is done*/
-    private void displayNotification(String title,String task){
-        NotificationManager notificationManager=(NotificationManager)getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
 
-        //Checking out the version of sdk for displaying notification
-        if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.O){
-            NotificationChannel channel=new NotificationChannel("WorkManager","manager",NotificationManager.IMPORTANCE_DEFAULT);
-            notificationManager.createNotificationChannel(channel);
-        }
-
-        NotificationCompat.Builder builder=new NotificationCompat.Builder(getApplicationContext(),"WorkManager")
-                .setContentTitle(title)
-                .setContentText(task)
-                .setSmallIcon(R.mipmap.ic_launcher);
-        notificationManager.notify(1,builder.build());
-
-    }
-
-    //This method is responsible for returning back the context
-    public Context getContext() {
-        return mContext;
-    }
-
-
-    //after parsing the sync_data_down.xml file we download the data from
-    //that api using this method first we collect the partial api
-    //then we write the code for completing the api and then we get the
-    //data from the server
-    public ArrayList<String> downloadAllTableDataFromServer(){
+    private ArrayList<String> downloadAllTableDataFromServer() {
         String service="all";
 
-        String applicationUrl=getApplicationContext().getString(R.string.APPLICATION_URL);
+        String applicationUrl=getContext().getString(R.string.APPLICATION_URL);
 
         //Parsing the sync_data_down.xml file for collecting the api
-        dataServices=new DataServices(getApplicationContext());
+        dataServices=new DataServices(getContext());
         ArrayList<DataSync> downServices=dataServices.dataDownServices();
 
 
@@ -126,6 +74,7 @@ public class DataDownWorker extends Worker {
                 //After Collecting the partial api we download the data form the
                 //url by making the url complete and we use here NetworkStream Class for
                 //downloading the data
+
                 String resultData = new NetworkStream().getStream(applicationUrl + dataRule.getServiceUrl(), 2, null);
                 Log.e("resultDataDown",resultData);
 
@@ -169,4 +118,15 @@ public class DataDownWorker extends Worker {
     }
 
 
+    @Override
+    public void onSyncCanceled() {
+        super.onSyncCanceled();
+        Log.i(TAG, "");
+    }
+
+    @Override
+    public void onSecurityException(Account account, Bundle extras, String authority, SyncResult syncResult) {
+        super.onSecurityException(account, extras, authority, syncResult);
+        Log.i(TAG,"Extras: " + extras);
+    }
 }
