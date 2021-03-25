@@ -22,6 +22,7 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 import static android.content.ContentValues.TAG;
 
@@ -50,9 +51,20 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
         int startTime= (int) System.currentTimeMillis();
+
         allData=downloadAllTableDataFromServer();
+
         int totalTimeRequired= (int) (System.currentTimeMillis()-startTime);
-        Log.e("TotalTimeRequired",String.valueOf(totalTimeRequired));
+
+        //hh:mm:ss
+        String time=String.format("%02d:%02d:%02d",
+                TimeUnit.MILLISECONDS.toHours(totalTimeRequired),
+                TimeUnit.MILLISECONDS.toMinutes(totalTimeRequired) -
+                        TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(totalTimeRequired)),
+                TimeUnit.MILLISECONDS.toSeconds(totalTimeRequired) -
+                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(totalTimeRequired)));
+
+        Log.e("TotalTimeRequired",time);
     }
 
 
