@@ -6,6 +6,7 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
+import org.apache.http.NameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -47,7 +48,7 @@ public class JsonParser {
 
 
     public static HashMap<String, ContentValues> getColIdAndValues(String dataString, String tableName) {
-        HashMap<String, ContentValues> valueList = new HashMap<>();
+        HashMap<String,ContentValues> valueList = new HashMap<>();
         if (dataString != null) {
             try {
                 JSONObject data = new JSONObject(dataString);
@@ -59,8 +60,7 @@ public class JsonParser {
                     JSONObject dataRows = dataArray.getJSONObject(i);
                     Iterator iterator = dataRows.keys();
                     String column_id = dataArray.getJSONObject(i).getString("sales_order_id");
-
-                    ContentValues mNewValues = new ContentValues();
+                    ContentValues mNewValues=new ContentValues();
                     for (int k = 0; iterator.hasNext(); k++) {
                         String single_column_name = (String) iterator.next();
                         String column_val = dataRows.getString(single_column_name).toString();
