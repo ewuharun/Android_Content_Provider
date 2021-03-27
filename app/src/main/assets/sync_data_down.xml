@@ -1,10 +1,6 @@
 <?xml version="1.0"?>
 
 <class>
-
-
-
-
     <services
         service="TBL_TODAYS_MIS_MERCHANDISING_FILTER_DATA"
         unique_column="sales_order_id"

@@ -7,9 +7,15 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SyncResult;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
+
+import androidx.annotation.RequiresApi;
 
 import com.example.workmanagerimplementation.R;
 import com.example.workmanagerimplementation.SyncUtils.HelperUtils.DataServices;
@@ -17,6 +23,7 @@ import com.example.workmanagerimplementation.SyncUtils.HelperUtils.DataSync;
 import com.example.workmanagerimplementation.SyncUtils.HelperUtils.DataSyncModel;
 import com.example.workmanagerimplementation.SyncUtils.HelperUtils.JsonParser;
 import com.example.workmanagerimplementation.SyncUtils.HelperUtils.NetworkStream;
+import com.example.workmanagerimplementation.data.DBHandler;
 import com.example.workmanagerimplementation.data.DataContract;
 import com.google.gson.Gson;
 
@@ -36,6 +43,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     private ArrayList<String> allData;
     private DataServices dataServices;
     private Context mContext;
+    private DBHandler dbHandler=new DBHandler(getContext());
 
 
     public SyncAdapter(Context context, boolean autoInitialize) {
@@ -52,7 +60,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
         int startTime= (int) System.currentTimeMillis();
 
-        allData=downloadAllTableDataFromServer();
+        //allData=downloadAllTableDataFromServer();
+        dataDown();
 
         int totalTimeRequired= (int) (System.currentTimeMillis()-startTime);
 
@@ -67,6 +76,63 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         Log.e("TotalTimeRequired",time);
     }
 
+    private void dataDown() {
+        String url="http://120.50.42.151/mobile_api/api/Merchandising/harunvaitest";
+
+        String resultData= new NetworkStream().getStream(url,2,null);
+        Log.e("result",resultData.toString());
+
+        Uri uri = DataContract.getUri("TBL_TODAYS_MIS_MERCHANDISING_FILTER_DATA");
+
+        HashMap<String,ContentValues> values=JsonParser.getColIdAndValues(resultData,"TBL_TODAYS_MIS_MERCHANDISING_FILTER_DATA");
+
+        HashMap<String,String> tableData=new DataSyncModel(contentResolver).getUniqueColumn(uri,"sales_order_id","");
+
+        //String sql = "INSERT INTO TBL_TODAYS_MIS_MERCHANDISING_FILTER_DATA (sales_order_id,so_oracle_id,dealer_name,name,order_date,order_date_time,delivery_date) VALUES (?,?,?,?,?,?,?)";
+
+
+        insert(tableData,values,uri);
+
+
+//        for (String key : values.keySet()) {
+//            if (!tableData.containsKey(key)) {
+//                ContentValues value = values.get(key);
+//
+//                boolean isInsert=insert(value);
+//                //Uri insertUri = contentResolver.insert(uri, value);
+//
+//                Log.d("MIS", uri.getPath()+key);
+//            } else {
+//                Log.e("MIS" + key, ":Already Exist");
+//            }
+//        }
+
+
+    }
+    public void insert(HashMap<String,String> tableData,HashMap<String,ContentValues> values,Uri uri) {
+        SQLiteDatabase db = dbHandler.getWritableDatabase();
+        boolean wasSuccess = true;
+        try {
+            db.beginTransaction();
+
+            for(String key: values.keySet()){
+                if(!tableData.containsKey(key)){
+                    ContentValues value = values.get(key);
+                    long result=db.insert("TBL_TODAYS_MIS_MERCHANDISING_FILTER_DATA",null,value);
+                    Log.d("MIS",uri.getPath()+key);
+
+                }else{
+                    Log.e("MIs" + key, ": Already Exists");
+                }
+            }
+            db.setTransactionSuccessful();
+
+        } finally {
+            db.endTransaction();
+            db.close();
+        }
+
+    }
 
 
     private ArrayList<String> downloadAllTableDataFromServer() {
@@ -104,7 +170,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                         Log.e("Uri",uri.toString());
 
 
-
                         HashMap<String,String> tableData=new DataSyncModel(contentResolver).getUniqueColumn(uri,dataRule.getUniqueColumn(),dataRule.getWhereCondition());
                         Log.e("tableData",tableData.toString());
                         HashMap<String, ContentValues> resultContentValuesList = JsonParser.getColIdAndValues(resultData, tableName);
@@ -116,6 +181,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                                 ContentValues value = resultContentValuesList.get(key);
 
                                 Uri insertUri = contentResolver.insert(uri, value);
+
+
                                 Log.d(tableName, insertUri.getPath());
                             } else {
                                 Log.e(tableName + key, ":Already Exist");
