@@ -114,15 +114,17 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         boolean wasSuccess = true;
         try {
             db.beginTransaction();
-
+            int i=1;
             for(String key: values.keySet()){
                 if(!tableData.containsKey(key)){
                     ContentValues value = values.get(key);
                     long result=db.insert("TBL_TODAYS_MIS_MERCHANDISING_FILTER_DATA",null,value);
-                    Log.d("MIS",uri.getPath()+key);
+                    Log.d("MIS",uri.getPath()+key+" index =  : "+i);
+                    i++;
 
                 }else{
-                    Log.e("MIs" + key, ": Already Exists");
+                    Log.e("MIs" + key, ": Already Exists : "+ i);
+                    i++;
                 }
             }
             db.setTransactionSuccessful();
@@ -174,7 +176,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                         Log.e("tableData",tableData.toString());
                         HashMap<String, ContentValues> resultContentValuesList = JsonParser.getColIdAndValues(resultData, tableName);
                         Log.e("resultcon",resultContentValuesList.toString());
-
+                        int i=1;
                         //Inserting the data into the sqlite local database
                         for (String key : resultContentValuesList.keySet()) {
                             if (!tableData.containsKey(key)) {
@@ -183,9 +185,12 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                                 Uri insertUri = contentResolver.insert(uri, value);
 
 
-                                Log.d(tableName, insertUri.getPath());
+                                Log.d(tableName, insertUri.getPath()+" / "+i);
+                                i++;
                             } else {
-                                Log.e(tableName + key, ":Already Exist");
+                                Log.e(tableName + key + "/"+i, ":Already Exist");
+                                i++;
+
                             }
                         }
 
