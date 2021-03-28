@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
@@ -21,6 +22,7 @@ import com.example.workmanagerimplementation.SyncUtils.HelperUtils.DataSyncModel
 import com.example.workmanagerimplementation.SyncUtils.HelperUtils.JsonParser;
 import com.example.workmanagerimplementation.SyncUtils.HelperUtils.NetworkStream;
 import com.example.workmanagerimplementation.SyncUtils.HelperUtils.DataSync;
+import com.example.workmanagerimplementation.data.DBHandler;
 import com.example.workmanagerimplementation.data.DataContract;
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.gson.Gson;
@@ -42,6 +44,7 @@ public class DataDownWorker extends Worker {
     private ContentResolver contentResolver;
     private DataServices dataServices;
     private ArrayList<String> allData;
+    DBHandler dbHandler=new DBHandler(getContext());
 
     //a public static string that will be used as the key
     //for sending and receiving data
@@ -72,7 +75,8 @@ public class DataDownWorker extends Worker {
 
         int startTime= (int) System.currentTimeMillis();
 
-        allData=downloadAllTableDataFromServer();
+        //allData=downloadAllTableDataFromServer();
+        dataDown();
 
         int totalTimeRequired= (int) (System.currentTimeMillis()-startTime);
 
@@ -93,6 +97,64 @@ public class DataDownWorker extends Worker {
 
         //Return Back the success status with data
         return Result.success();
+    }
+
+    private void dataDown() {
+        String url="http://120.50.42.151/mobile_api/api/Merchandising/harunvaitest";
+
+        String resultData= new NetworkStream().getStream(url,2,null);
+        Log.e("result",resultData.toString());
+
+        Uri uri = DataContract.getUri("TBL_TODAYS_MIS_MERCHANDISING_FILTER_DATA");
+
+        HashMap<String,ContentValues> values=JsonParser.getColIdAndValues(resultData,"TBL_TODAYS_MIS_MERCHANDISING_FILTER_DATA");
+
+        HashMap<String,String> tableData=new DataSyncModel(contentResolver).getUniqueColumn(uri,"sales_order_id","");
+
+        //String sql = "INSERT INTO TBL_TODAYS_MIS_MERCHANDISING_FILTER_DATA (sales_order_id,so_oracle_id,dealer_name,name,order_date,order_date_time,delivery_date) VALUES (?,?,?,?,?,?,?)";
+
+
+        insert(tableData,values,uri);
+
+
+//        for (String key : values.keySet()) {
+//            if (!tableData.containsKey(key)) {
+//                ContentValues value = values.get(key);
+//
+//                boolean isInsert=insert(value);
+//                //Uri insertUri = contentResolver.insert(uri, value);
+//
+//                Log.d("MIS", uri.getPath()+key);
+//            } else {
+//                Log.e("MIS" + key, ":Already Exist");
+//            }
+//        }
+
+
+    }
+    public void insert(HashMap<String,String> tableData,HashMap<String,ContentValues> values,Uri uri) {
+        SQLiteDatabase db = dbHandler.getWritableDatabase();
+        boolean wasSuccess = true;
+        try {
+            db.beginTransaction();
+
+            for(String key: values.keySet()){
+                if(!tableData.containsKey(key)){
+                    ContentValues value = values.get(key);
+                    long result=db.insert("TBL_TODAYS_MIS_MERCHANDISING_FILTER_DATA",null,value);
+                    Log.d("MIS",uri.getPath()+key);
+
+                }else{
+                    Log.e("MIs" + key, ": Already Exists");
+                }
+            }
+            db.setTransactionSuccessful();
+
+        } finally {
+            db.endTransaction();
+            db.close();
+        }
+
     }
 
 
