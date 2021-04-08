@@ -1,10 +1,6 @@
 <?xml version="1.0"?>
 
 <class>
-
-
-
-
     <services
         service="TBL_TODAYS_MIS_MERCHANDISING_FILTER_DATA"
         unique_column="sales_order_id"
@@ -12,6 +8,15 @@
         url="/mobile_api/api/Merchandising/harunvaitest"
         where_condition="">
     </services>
+
+    <services
+        service="Menu_List_Data"
+        unique_column="column_id"
+        http_method="2"
+        url="/mobile_api/api/Merchandising/getApkMenuList"
+        where_condition="">
+    </services>
+
 
 
 

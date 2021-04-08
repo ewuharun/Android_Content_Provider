@@ -51,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //initialize the Variables of the activity_main layout
         initVariables();
 
         //employeeModel=new EmployeeModel(getContentResolver());
@@ -86,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
 //        final PeriodicWorkRequest workRequest=new PeriodicWorkRequest.Builder(DataUpWorker.class,16, TimeUnit.MINUTES).build();
 
         //this is the subclass of work request
-        final OneTimeWorkRequest workRequest1=new OneTimeWorkRequest.Builder(DataDownWorker.class)
+        final OneTimeWorkRequest dataDownWorkRequest=new OneTimeWorkRequest.Builder(DataDownWorker.class)
                 .setInputData(dataDown)
                 //.setConstraints(constraints)
                 .build();
@@ -139,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
 
                 Log.e("StartTime",String.valueOf(new Date().getTime()));
 
-                WorkManager.getInstance().enqueue(workRequest1);
+                WorkManager.getInstance().enqueue(dataDownWorkRequest);
 
                 ArrayList<Sales> sales=new ArrayList<>();
                 SalesModel salesModel=new SalesModel(getContentResolver());
@@ -155,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         //observ the status of the background work done by WorkManager
-        WorkManager.getInstance().getWorkInfoByIdLiveData(workRequest1.getId())
+        WorkManager.getInstance().getWorkInfoByIdLiveData(dataDownWorkRequest.getId())
                 .observe(MainActivity.this, new Observer<WorkInfo>() {
                     @Override
                     public void onChanged(WorkInfo workInfo) {

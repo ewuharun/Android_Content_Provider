@@ -30,7 +30,7 @@ public class DataSyncModel {
         Log.e("uni",uniqueColumnName);
         HashMap<String, String> uniqueColumn = new HashMap<>();
         String[] projection = {
-                uniqueColumnName
+                uniqueColumnName,
         };
         Cursor cursor = contentResolver.query(uri, projection, condition, null, null);
         Log.e("cursor",new Gson().toJson(cursor));

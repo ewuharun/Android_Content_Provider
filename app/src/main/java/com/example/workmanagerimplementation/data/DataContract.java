@@ -1,5 +1,6 @@
 package com.example.workmanagerimplementation.data;
 
+import android.icu.lang.UProperty;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
@@ -11,11 +12,14 @@ import java.security.PublicKey;
  * BABL, Bangladesh,
  */
 public class DataContract {
+
     public static final String CONTENT_AUTHORITY="com.example.workmanagerimplementation.data";
     public static final Uri BASE_CONTENT_URI=Uri.parse("content://"+CONTENT_AUTHORITY);
 
-    public static final String PATH_EMPLOYEE="tbl_testdata";
+
     public static final String PATH_SALES_ORDER="TBL_TODAYS_MIS_MERCHANDISING_FILTER_DATA";
+    public static final String PATH_MENU_LIST="Menu_List_Data";
+    public static final String PATH_EMPLOYEE="tbl_test_data";
 
 
     public static Uri getUri(String tableName){
@@ -44,6 +48,18 @@ public class DataContract {
         public static final String ORDER_DATE="order_date";
         public static final String ORDER_DATE_TIME="order_date_time";
         public static final String DELIVERY_DATE="delivery_date";
+    }
+
+    public static class MenuListEntry implements BaseColumns{
+        public static final Uri CONTENT_URI=BASE_CONTENT_URI.buildUpon().appendPath(PATH_MENU_LIST).build();
+        public static final String TABLE_NAME="Menu_List_Data";
+        public static final String COLUMN_ID="column_id";
+        public static final String MENU_ID="menu_id";
+        public static final String TITLE="title";
+        public static final String LOGO="logo";
+        public static final String POSITION="position";
+        public static final String ROLE_CODE="role_code";
+        public static final String IS_SYNCED="is_synced";
     }
 
 }

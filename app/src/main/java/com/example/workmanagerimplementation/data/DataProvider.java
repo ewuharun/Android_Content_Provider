@@ -19,8 +19,9 @@ import androidx.work.Data;
 public class DataProvider extends ContentProvider {
 
     DBHandler db;
-    static final int INSERT_EMPLOYEE=102;
+
     static final int SALES_ORDER=103;
+    static final int GET_MENU_LIST=104;
 
 
     private static final UriMatcher sUriMatcher=buildUriMatcher();
@@ -30,8 +31,8 @@ public class DataProvider extends ContentProvider {
         final UriMatcher matcher=new UriMatcher(UriMatcher.NO_MATCH);
         final String authority=DataContract.CONTENT_AUTHORITY;
 
-        matcher.addURI(authority,DataContract.PATH_EMPLOYEE,INSERT_EMPLOYEE);
         matcher.addURI(authority,DataContract.PATH_SALES_ORDER,SALES_ORDER);
+        matcher.addURI(authority,DataContract.PATH_MENU_LIST,GET_MENU_LIST);
         return matcher;
 
     }
@@ -51,11 +52,11 @@ public class DataProvider extends ContentProvider {
         int uriType=sUriMatcher.match(uri);
 
         switch (uriType){
-            case INSERT_EMPLOYEE:
-                queryBuilder.setTables(DataContract.EmployeeEntry.TABLE_NAME);
-                break;
             case SALES_ORDER:
                 queryBuilder.setTables(DataContract.SalesEntry.TABLE_NAME);
+                break;
+            case GET_MENU_LIST:
+                queryBuilder.setTables(DataContract.MenuListEntry.TABLE_NAME);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown Uri : "+uri);
@@ -80,11 +81,12 @@ public class DataProvider extends ContentProvider {
         long id;
 
         switch (sUriMatcher.match(uri)){
-            case INSERT_EMPLOYEE:
-                id=writableDb.insert(DataContract.EmployeeEntry.TABLE_NAME,null,values);
-                break;
+
             case SALES_ORDER:
                 id=writableDb.insert(DataContract.SalesEntry.TABLE_NAME,null,values);
+                break;
+            case GET_MENU_LIST:
+                id=writableDb.insert(DataContract.MenuListEntry.TABLE_NAME,null,values);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown Uri : "+uri);
@@ -101,11 +103,12 @@ public class DataProvider extends ContentProvider {
         SQLiteDatabase writableDb=db.getWritableDatabase();
 
         switch (sUriMatcher.match(uri)){
-            case INSERT_EMPLOYEE:
-                count=writableDb.delete(DataContract.EmployeeEntry.TABLE_NAME,selection,selectionArgs);
-                break;
+
             case SALES_ORDER:
                 count=writableDb.delete(DataContract.SalesEntry.TABLE_NAME,selection,selectionArgs);
+                break;
+            case GET_MENU_LIST:
+                count=writableDb.delete(DataContract.MenuListEntry.TABLE_NAME,selection,selectionArgs);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown Uri : "+uri);
@@ -119,11 +122,12 @@ public class DataProvider extends ContentProvider {
         int count=0;
         SQLiteDatabase writableDb=db.getWritableDatabase();
         switch (sUriMatcher.match(uri)){
-            case INSERT_EMPLOYEE:
-                count=writableDb.update(DataContract.EmployeeEntry.TABLE_NAME,values,selection,selectionArgs);
-                break;
+
             case SALES_ORDER:
                 count=writableDb.update(DataContract.SalesEntry.TABLE_NAME,values,selection,selectionArgs);
+                break;
+            case GET_MENU_LIST:
+                count=writableDb.update(DataContract.MenuListEntry.TABLE_NAME,values,selection,selectionArgs);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown Uri : "+uri);

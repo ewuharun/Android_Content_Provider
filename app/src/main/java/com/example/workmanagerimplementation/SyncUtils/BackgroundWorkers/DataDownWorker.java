@@ -27,11 +27,18 @@ import com.example.workmanagerimplementation.data.DataContract;
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.gson.Gson;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
+
+import retrofit2.http.Url;
 
 /**
  * Created by Md.harun or rashid on 21,March,2021
@@ -44,7 +51,7 @@ public class DataDownWorker extends Worker {
     private ContentResolver contentResolver;
     private DataServices dataServices;
     private ArrayList<String> allData;
-    DBHandler dbHandler=new DBHandler(getContext());
+    DBHandler dbHandler;
 
     //a public static string that will be used as the key
     //for sending and receiving data
@@ -54,6 +61,7 @@ public class DataDownWorker extends Worker {
     public DataDownWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
         this.contentResolver=context.getContentResolver();
+        this.dbHandler=new DBHandler(context);
     }
 
     /*This doWork Method is responsible for doing the work in the
@@ -75,8 +83,13 @@ public class DataDownWorker extends Worker {
 
         int startTime= (int) System.currentTimeMillis();
 
+        String TABLE_TEST_DATA=getApplicationContext().getString(R.string.TABLE_TEST_DATA);
+        String TABLE_MENU_LIST_DATA=getApplicationContext().getString(R.string.TBL_MENU_LIST_DATA);
+
         //allData=downloadAllTableDataFromServer();
-        dataDown();
+
+        dataDown(TABLE_TEST_DATA);
+        getDataForMenuList(TABLE_MENU_LIST_DATA);
 
         int totalTimeRequired= (int) (System.currentTimeMillis()-startTime);
 
@@ -99,22 +112,42 @@ public class DataDownWorker extends Worker {
         return Result.success();
     }
 
-    private void dataDown() {
-        String url="http://120.50.42.151/mobile_api/api/Merchandising/harunvaitest";
+    private void getDataForMenuList(String tableName) {
+        List<NameValuePair> params=new ArrayList<NameValuePair>();
+        params.add(new BasicNameValuePair("role_code","SR"));
+        String url =getApplicationContext().getString(R.string.GET_MENU_LIST_URL);
+
+        String response=new NetworkStream().getStream(url,2,params);
+        Log.e("menu_list_data",response);
+
+        HashMap<String,ContentValues> hashMap=JsonParser.getColIdAndValues(response,tableName);
+        Log.e("hasMap",new Gson().toJson(hashMap));
+
+        Uri uri=DataContract.getUri(tableName);
+        HashMap<String,String> tableData=new DataSyncModel(contentResolver).getUniqueColumn(uri,"column_id","");
+
+        insert(tableData,hashMap,uri,tableName);
+
+
+
+    }
+
+    private void dataDown(String tableName) {
+        String url=getApplicationContext().getString(R.string.GET_TEST_DATA_URL);
 
         String resultData= new NetworkStream().getStream(url,2,null);
-        Log.e("result",resultData.toString());
+        Log.e("response",resultData.toString());
 
-        Uri uri = DataContract.getUri("TBL_TODAYS_MIS_MERCHANDISING_FILTER_DATA");
+        Uri uri = DataContract.getUri(tableName);
 
-        HashMap<String,ContentValues> values=JsonParser.getColIdAndValues(resultData,"TBL_TODAYS_MIS_MERCHANDISING_FILTER_DATA");
+        HashMap<String,ContentValues> values=JsonParser.getColIdAndValuesForTestData(resultData,tableName);
 
         HashMap<String,String> tableData=new DataSyncModel(contentResolver).getUniqueColumn(uri,"sales_order_id","");
 
         //String sql = "INSERT INTO TBL_TODAYS_MIS_MERCHANDISING_FILTER_DATA (sales_order_id,so_oracle_id,dealer_name,name,order_date,order_date_time,delivery_date) VALUES (?,?,?,?,?,?,?)";
 
 
-        insert(tableData,values,uri);
+        insert(tableData,values,uri,tableName);
 
 
 //        for (String key : values.keySet()) {
@@ -132,17 +165,18 @@ public class DataDownWorker extends Worker {
 
 
     }
-    public void insert(HashMap<String,String> tableData,HashMap<String,ContentValues> values,Uri uri) {
+    public void insert(HashMap<String,String> tableData,HashMap<String,ContentValues> values,Uri uri,String tableName) {
         SQLiteDatabase db = dbHandler.getWritableDatabase();
         boolean wasSuccess = true;
         try {
             db.beginTransaction();
-
+            int i=1;
             for(String key: values.keySet()){
                 if(!tableData.containsKey(key)){
                     ContentValues value = values.get(key);
-                    long result=db.insert("TBL_TODAYS_MIS_MERCHANDISING_FILTER_DATA",null,value);
-                    Log.d("MIS",uri.getPath()+key);
+                    long result=db.insert(tableName,null,value);
+                    Log.d("MIS",uri.getPath()+key+" index "+i);
+                    i++;
 
                 }else{
                     Log.e("MIs" + key, ": Already Exists");

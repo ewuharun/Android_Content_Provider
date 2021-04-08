@@ -58,6 +58,38 @@ public class JsonParser {
                 for (int i = 0; i < dataArray.length(); ++i) {
                     JSONObject dataRows = dataArray.getJSONObject(i);
                     Iterator iterator = dataRows.keys();
+                    String column_id = dataArray.getJSONObject(i).getString("column_id");
+
+                    ContentValues mNewValues = new ContentValues();
+                    for (int k = 0; iterator.hasNext(); k++) {
+                        String single_column_name = (String) iterator.next();
+                        String column_val = dataRows.getString(single_column_name).toString();
+                        mNewValues.put(single_column_name, column_val);
+                    }
+                    valueList.put(column_id , mNewValues);
+                }
+
+            } catch (JSONException var21) {
+                var21.printStackTrace();
+            }
+        } else {
+            Log.e("ServiceHandler", "Couldn\'t get any data from the url");
+        }
+        return valueList;
+    }
+
+    public static HashMap<String, ContentValues> getColIdAndValuesForTestData(String dataString, String tableName) {
+        HashMap<String, ContentValues> valueList = new HashMap<>();
+        if (dataString != null) {
+            try {
+                JSONObject data = new JSONObject(dataString);
+//                String action_name = data.getJSONObject(tableName).getString("action");
+//                Log.e("Json Obtain Action : ", action_name);
+                JSONArray dataArray = data.getJSONObject(tableName).getJSONArray("data");
+                Log.v("Data Row Length : ", " : " + dataArray.length());
+                for (int i = 0; i < dataArray.length(); ++i) {
+                    JSONObject dataRows = dataArray.getJSONObject(i);
+                    Iterator iterator = dataRows.keys();
                     String column_id = dataArray.getJSONObject(i).getString("sales_order_id");
 
                     ContentValues mNewValues = new ContentValues();

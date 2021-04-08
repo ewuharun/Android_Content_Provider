@@ -1,28 +1,29 @@
 <?xml version="1.0"?>
 <class>
 
-
-    <table tablename="tbl_testdata">
-        <col_name type="INTEGER" index="PRIMARY KEY" prop="AUTOINCREMENT">id</col_name>
-        <col_name type="TEXT">name</col_name>
-        <col_name type="INTEGER">age</col_name>
-        <col_name type="TEXT">phone</col_name>
-        <col_name type="TEXT">email</col_name>
-        <col_name type="INTEGER">column_id</col_name>
-        <col_name type="INTEGER">is_synced</col_name>
-    </table>
-
-
-
     <table tablename="TBL_TODAYS_MIS_MERCHANDISING_FILTER_DATA">
         <col_name type="INTEGER" index="PRIMARY KEY" prop="AUTOINCREMENT">id</col_name>
         <col_name type="INTEGER">sales_order_id</col_name>
+        <col_name type="TEXT">column_id</col_name>
         <col_name type="TEXT">so_oracle_id</col_name>
         <col_name type="TEXT">dealer_name</col_name>
         <col_name type="TEXT">name</col_name>
         <col_name type="TEXT">order_date</col_name>
         <col_name type="TEXT">order_date_time</col_name>
         <col_name type="TEXT">delivery_date</col_name>
+    </table>
+
+
+    <table tablename="Menu_List_Data">
+        <col_name type="INTEGER" index="PRIMARY KEY" prop="AUTOINCREMENT">id</col_name>
+        <col_name type="TEXT">title</col_name>
+        <col_name type="INTEGER">column_id</col_name>
+        <col_name type="INTEGER">menu_id</col_name>
+        <col_name type="TEXT">logo</col_name>
+        <col_name type="INTEGER">position</col_name>
+        <col_name type="TEXT">role_code</col_name>
+        <col_name type="INTEGER">is_synced</col_name>
+
     </table>
 
 

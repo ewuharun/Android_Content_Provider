@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">WorkManagerImplementation</string>
     <string name="APPLICATION_URL">http://120.50.42.151</string>
+    <string name="GET_MENU_LIST_URL">http://120.50.42.151/mobile_api/api/Merchandising/getApkMenuList</string>
+    <string name="GET_TEST_DATA_URL">http://120.50.42.151/mobile_api/api/Merchandising/harunvaitest</string>
+    <string name="TBL_MENU_LIST_DATA">Menu_List_Data</string>
+    <string name="TABLE_TEST_DATA">TBL_TODAYS_MIS_MERCHANDISING_FILTER_DATA</string>
+    
 </resources>
