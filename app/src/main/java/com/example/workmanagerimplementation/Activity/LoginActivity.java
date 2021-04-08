@@ -1,6 +1,9 @@
 package com.example.workmanagerimplementation.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.work.Data;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,6 +11,9 @@ import android.view.View;
 import android.widget.Button;
 
 import com.example.workmanagerimplementation.R;
+import com.example.workmanagerimplementation.SyncUtils.BackgroundWorkers.DataDownWorker;
+
+import java.util.Date;
 
 public class LoginActivity extends AppCompatActivity {
     private Button loginBtn;
@@ -22,6 +28,7 @@ public class LoginActivity extends AppCompatActivity {
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 Intent intent=new Intent(LoginActivity.this,MainActivity.class);
                 startActivity(intent);
             }

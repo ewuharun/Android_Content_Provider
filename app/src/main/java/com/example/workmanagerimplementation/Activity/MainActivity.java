@@ -1,6 +1,7 @@
 package com.example.workmanagerimplementation.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.menu.MenuView;
 import androidx.lifecycle.Observer;
 import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
@@ -14,13 +15,18 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.workmanagerimplementation.Adapter.GridViewAdapter;
 import com.example.workmanagerimplementation.Models.EmployeeModel;
+import com.example.workmanagerimplementation.Models.MainMenuModel;
 import com.example.workmanagerimplementation.Models.Pojo.Employee;
+import com.example.workmanagerimplementation.Models.Pojo.MainMenu;
 import com.example.workmanagerimplementation.Models.Pojo.Sales;
 import com.example.workmanagerimplementation.Models.SalesModel;
 import com.example.workmanagerimplementation.R;
@@ -35,91 +41,58 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
-    private Button startTaskBtn,oneTimeWorkReqBtn,logoutBtn;
+    private Button logoutBtn;
     private TextView workStatusTv;
-    private EditText nameEt,ageEt,phoneEt,emailEt;
     private DBHandler dbHandler;
     private SQLiteDatabase db;
     private ContentResolver contentResolver;
     private EmployeeModel employeeModel;
+    private GridView gridView;
+    private GridViewAdapter gridViewAdapter;
 
-    private String name,phone,email;
-    private int age;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        initVariables();
-
-        //employeeModel=new EmployeeModel(getContentResolver());
-
-
-
-
-
-
-
-        //workStatusTv.setText(new Gson().toJson(trucks));
-
         //creating constraints
 //        Constraints constraints = new Constraints.Builder()
 //                .setRequiresCharging(true) // you can add as many constraints as you want
 //                .build();
 
-        //creating a data object
-        //to pass the data with workRequest
-        //we can put as many variables needed
-//        Data data=new Data.Builder()
-//                .putString(DataUpWorker.TASK_DESC,"The task data passed from main activity")
-//                .build();
-        Data dataDown=new Data.Builder()
-                .putString(DataDownWorker.TASK_DESC,String.valueOf(new Date().getTime()))
-                .build();
 
-
-
-
-        //this is the subclass of work request
+        //this is the subclass of periodic work request
 //        final PeriodicWorkRequest workRequest=new PeriodicWorkRequest.Builder(DataUpWorker.class,16, TimeUnit.MINUTES).build();
 
-        //this is the subclass of work request
-        final OneTimeWorkRequest dataDownWorkRequest=new OneTimeWorkRequest.Builder(DataDownWorker.class)
-                .setInputData(dataDown)
-                //.setConstraints(constraints)
-                .build();
+
+        initVariables();
+        SyncData();
+        MainMenuModel mainMenuModel=new MainMenuModel(getContentResolver());
+
+        ArrayList<MainMenu> mainMenuArrayList=new ArrayList<MainMenu>();
+
+        mainMenuArrayList=mainMenuModel.getAllMenuList("SR");
+
+        mainMenuModel.sort(mainMenuArrayList);
 
 
-        //WorkManager.getInstance().enqueue(workRequest1);
-        //WorkManager.getInstance().enqueue(workRequest);
+        Log.e("ArrayList",new Gson().toJson(mainMenuArrayList));
 
-        //employeeModel.getEmployeeList();
+        gridViewAdapter=new GridViewAdapter(getApplicationContext(),mainMenuArrayList);
+        gridView.setAdapter(gridViewAdapter);
 
-
-
-        //WorkManager.getInstance().cancelWorkById(workRequest.getId());
-
-        //Log.e("employee",new Gson().toJson(employeeModel.getEmployeeList()));
-
-        //while clicking on the startTaskBtn
-        startTaskBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                name=nameEt.getText().toString().trim();
-                age=Integer.valueOf(ageEt.getText().toString().trim());
-                phone=phoneEt.getText().toString().trim();
-                email=emailEt.getText().toString().trim();
-
-                //Employee employee=new Employee(name,age,phone,email,0,0);
+        menuAction(gridView);
 
 
-                //String isInserted=employeeModel.insertEmployee(employee);
-                //Toast.makeText(MainActivity.this, isInserted, Toast.LENGTH_SHORT).show();
 
 
-            }
-        });
+
+
+
+
+
+
 
 
         logoutBtn.setOnClickListener(new View.OnClickListener() {
@@ -130,29 +103,45 @@ public class MainActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
 
-
-        oneTimeWorkReqBtn.setOnClickListener(new View.OnClickListener() {
+    private void menuAction(GridView gridView) {
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                Log.e("StartTime",String.valueOf(new Date().getTime()));
+                MainMenu mainMenu= (MainMenu) gridView.getItemAtPosition(position);
 
-                WorkManager.getInstance().enqueue(dataDownWorkRequest);
 
-                ArrayList<Sales> sales=new ArrayList<>();
-                SalesModel salesModel=new SalesModel(getContentResolver());
-                sales=salesModel.salesOrder();
+                //Toast.makeText(getApplicationContext(),mainMenu.getMenuTitle(), Toast.LENGTH_SHORT).show();
+                
+                String title=mainMenu.getMenuTitle();
+                
+                switch (title){
+                    case "profile_icon":
+                        Toast.makeText(MainActivity.this, "Profile Icon", Toast.LENGTH_SHORT).show();
+                        break;
+                    case  "verify_retailer":
+                        Toast.makeText(MainActivity.this, "Verify_Retailer", Toast.LENGTH_SHORT).show();
+                        break;
+                    default:
+                        Toast.makeText(MainActivity.this, "Default", Toast.LENGTH_SHORT).show();
+                        break;
+                }
 
-                Log.e("sizeData", String.valueOf(sales.size()));
-
-                Log.e("dataDown",new Gson().toJson(sales));
             }
         });
+    }
 
-
-
-
+    private void SyncData() {
+        Data dataDown=new Data.Builder()
+                .putString(DataDownWorker.TASK_DESC,String.valueOf(new Date().getTime()))
+                .build();
+        final OneTimeWorkRequest dataDownWorkRequest=new OneTimeWorkRequest.Builder(DataDownWorker.class)
+                .setInputData(dataDown)
+                //.setConstraints(constraints)
+                .build();
+        WorkManager.getInstance().enqueue(dataDownWorkRequest);
         //observ the status of the background work done by WorkManager
         WorkManager.getInstance().getWorkInfoByIdLiveData(dataDownWorkRequest.getId())
                 .observe(MainActivity.this, new Observer<WorkInfo>() {
@@ -179,19 +168,17 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Toast.makeText(this, "MainActi", Toast.LENGTH_SHORT).show();
+    }
 
     private void initVariables() {
-        startTaskBtn=findViewById(R.id.startWorkBtn);
-        oneTimeWorkReqBtn=findViewById(R.id.oneTimeWorkBtn);
-        workStatusTv=findViewById(R.id.workStatusTv);
+        workStatusTv=(TextView) findViewById(R.id.workStatusTv);
         dbHandler=new DBHandler(getApplicationContext());
-
-        nameEt=findViewById(R.id.nameEt);
-        ageEt=findViewById(R.id.ageEt);
-        phoneEt=findViewById(R.id.phoneEt);
-        emailEt=findViewById(R.id.emailEt);
-
-        logoutBtn=findViewById(R.id.logoutBtn);
+        gridView=findViewById(R.id.gridView);
+        logoutBtn=(Button) findViewById(R.id.logoutBtn);
     }
 
 

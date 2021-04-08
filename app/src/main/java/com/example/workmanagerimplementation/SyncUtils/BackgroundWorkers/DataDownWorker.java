@@ -53,9 +53,15 @@ public class DataDownWorker extends Worker {
     private ArrayList<String> allData;
     DBHandler dbHandler;
 
+
+
+
     //a public static string that will be used as the key
     //for sending and receiving data
     public static final String TASK_DESC="task_desc";
+
+
+
 
     //Constructor for DataDownWorker Class
     public DataDownWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
@@ -63,6 +69,9 @@ public class DataDownWorker extends Worker {
         this.contentResolver=context.getContentResolver();
         this.dbHandler=new DBHandler(context);
     }
+
+
+
 
     /*This doWork Method is responsible for doing the work in the
     background and here we download the data from the server*/
@@ -78,9 +87,6 @@ public class DataDownWorker extends Worker {
 
         //ArrayList of all String which is coming back from DataDown Service from
         //all api
-
-
-
         int startTime= (int) System.currentTimeMillis();
 
         String TABLE_TEST_DATA=getApplicationContext().getString(R.string.TABLE_TEST_DATA);
@@ -88,8 +94,8 @@ public class DataDownWorker extends Worker {
 
         //allData=downloadAllTableDataFromServer();
 
-        dataDown(TABLE_TEST_DATA);
-        getDataForMenuList(TABLE_MENU_LIST_DATA);
+        //dataDown(TABLE_TEST_DATA);
+        //getDataForMenuList(TABLE_MENU_LIST_DATA);
 
         int totalTimeRequired= (int) (System.currentTimeMillis()-startTime);
 
@@ -127,8 +133,6 @@ public class DataDownWorker extends Worker {
         HashMap<String,String> tableData=new DataSyncModel(contentResolver).getUniqueColumn(uri,"column_id","");
 
         insert(tableData,hashMap,uri,tableName);
-
-
 
     }
 
