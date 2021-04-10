@@ -55,6 +55,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        dbHandler=new DBHandler(getApplicationContext());
+        db=dbHandler.getWritableDatabase();
+        dbHandler.createTable(db);
 
         //creating constraints
 //        Constraints constraints = new Constraints.Builder()
@@ -176,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void initVariables() {
         workStatusTv=(TextView) findViewById(R.id.workStatusTv);
-        dbHandler=new DBHandler(getApplicationContext());
+
         gridView=findViewById(R.id.gridView);
         logoutBtn=(Button) findViewById(R.id.logoutBtn);
     }

@@ -54,8 +54,6 @@ public class DataDownWorker extends Worker {
     DBHandler dbHandler;
 
 
-
-
     //a public static string that will be used as the key
     //for sending and receiving data
     public static final String TASK_DESC="task_desc";
@@ -94,7 +92,7 @@ public class DataDownWorker extends Worker {
 
         //allData=downloadAllTableDataFromServer();
 
-        //dataDown(TABLE_TEST_DATA);
+        dataDown(TABLE_TEST_DATA);
         //getDataForMenuList(TABLE_MENU_LIST_DATA);
 
         int totalTimeRequired= (int) (System.currentTimeMillis()-startTime);
@@ -151,7 +149,7 @@ public class DataDownWorker extends Worker {
         //String sql = "INSERT INTO TBL_TODAYS_MIS_MERCHANDISING_FILTER_DATA (sales_order_id,so_oracle_id,dealer_name,name,order_date,order_date_time,delivery_date) VALUES (?,?,?,?,?,?,?)";
 
 
-        insert(tableData,values,uri,tableName);
+        insertFinal(tableData,values,uri,tableName);
 
 
 //        for (String key : values.keySet()) {
@@ -184,6 +182,55 @@ public class DataDownWorker extends Worker {
 
                 }else{
                     Log.e("MIs" + key, ": Already Exists");
+                }
+            }
+            db.setTransactionSuccessful();
+
+        } finally {
+            db.endTransaction();
+            db.close();
+        }
+
+    }
+
+    public void insertFinal(HashMap<String,String> tableData,HashMap<String,ContentValues> values,Uri uri,String tableName) {
+        SQLiteDatabase db = dbHandler.getWritableDatabase();
+        Log.e("sqliteData",String.valueOf(tableData.size()));
+        Log.e("BackendData",String.valueOf(values.size()));
+
+        boolean wasSuccess = true;
+        try {
+            db.beginTransaction();
+            int i=1;
+
+            if(Integer.valueOf(tableData.size())>=Integer.valueOf(values.size())){
+                for(String key: tableData.keySet()){
+                    if(values.containsKey(key)){
+                        //is_synced(1);
+                        Log.e("Sqlite1",key);
+                        Log.e("Data " + key, ": Already Exists");
+                    }else{
+                        //is_synced(0)
+                        Log.e("Sqlite2",key);
+                        Log.e("Data " + key, ": Already Exists");
+                    }
+                }
+            }else{
+                for(String key: values.keySet()){
+                    if(tableData.containsKey(key)){
+                      //is_synced(1);
+                        Log.e("Data " + key, ": Already Exists");
+                        Log.e("Sqlite3",key);
+                        i++;
+
+                    }else{
+                        ContentValues value = values.get(key);
+                        long result=db.insert(tableName,null,value);
+                        Log.d("INSERTED ",uri.getPath()+key+" index "+i);
+                        Log.e("Sqlite4",key);
+
+                        //is_synced(1);
+                    }
                 }
             }
             db.setTransactionSuccessful();
