@@ -2,9 +2,11 @@ package com.example.workmanagerimplementation.Models;
 
 import android.content.ContentResolver;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.example.workmanagerimplementation.Models.Pojo.MainMenu;
+import com.example.workmanagerimplementation.data.DBHandler;
 import com.example.workmanagerimplementation.data.DataContract;
 import com.google.gson.Gson;
 
@@ -18,6 +20,7 @@ import java.util.Comparator;
  */
 public class MainMenuModel{
     ContentResolver contentResolver;
+    DBHandler db;
 
     public MainMenuModel(ContentResolver contentResolver) {
         this.contentResolver = contentResolver;
@@ -71,4 +74,33 @@ public class MainMenuModel{
 
         return mainMenuArrayList;
     }
+
+
+
+    public ArrayList<MainMenu> readAllItems() {
+        ArrayList<MainMenu> items = new ArrayList<>();
+
+        Cursor cursor = contentResolver.query(DataContract.MenuListEntry.CONTENT_URI,null,null,null,null);
+
+
+
+        if (cursor!=null) {
+            while (cursor.moveToNext()) {
+                // move the cursor to next row if there is any to read it's data
+                MainMenu item = readItem(cursor);
+                items.add(item);
+            }
+        }
+        return items;
+    }
+
+    private MainMenu readItem(Cursor cursor) {
+        MainMenu item = new MainMenu();
+        item.setMenuTitle(cursor.getString(cursor.getColumnIndex(DataContract.MenuListEntry.IS_SYNCED)));
+        return item;
+
+    }
+
+
+
 }

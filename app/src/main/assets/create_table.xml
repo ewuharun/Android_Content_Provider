@@ -11,6 +11,7 @@
         <col_name type="TEXT">order_date</col_name>
         <col_name type="TEXT">order_date_time</col_name>
         <col_name type="TEXT">delivery_date</col_name>
+        <col_name type="INTEGER">is_synced</col_name>
     </table>
 
 

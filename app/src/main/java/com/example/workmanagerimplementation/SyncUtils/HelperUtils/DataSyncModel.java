@@ -40,6 +40,7 @@ public class DataSyncModel {
             } while (cursor.moveToNext());
         }
         cursor.close();
+        Log.e("Hashmap unique",new Gson().toJson(uniqueColumn));
         return uniqueColumn;
     }
 

@@ -2,9 +2,11 @@ package com.example.workmanagerimplementation.SyncUtils.BackgroundWorkers;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Build;
@@ -16,6 +18,7 @@ import androidx.work.Data;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
+import com.example.workmanagerimplementation.Activity.LoginActivity;
 import com.example.workmanagerimplementation.R;
 import com.example.workmanagerimplementation.SyncUtils.HelperUtils.DataServices;
 import com.example.workmanagerimplementation.SyncUtils.HelperUtils.DataSyncModel;
@@ -59,32 +62,20 @@ public class DataDownWorker extends Worker {
     public static final String TASK_DESC="task_desc";
 
 
-
-
-    //Constructor for DataDownWorker Class
     public DataDownWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
         this.contentResolver=context.getContentResolver();
         this.dbHandler=new DBHandler(context);
     }
 
-
-
-
-    /*This doWork Method is responsible for doing the work in the
-    background and here we download the data from the server*/
     @NonNull
     @Override
     public Result doWork() {
 
         //getting the input data
         String taskDesc=getInputData().getString(TASK_DESC);
-
-        //Notification show while apps run in the background
         displayNotification("Worker",taskDesc);
 
-        //ArrayList of all String which is coming back from DataDown Service from
-        //all api
         int startTime= (int) System.currentTimeMillis();
 
         String TABLE_TEST_DATA=getApplicationContext().getString(R.string.TABLE_TEST_DATA);
@@ -93,7 +84,7 @@ public class DataDownWorker extends Worker {
         //allData=downloadAllTableDataFromServer();
 
         dataDown(TABLE_TEST_DATA);
-        //getDataForMenuList(TABLE_MENU_LIST_DATA);
+        getDataForMenuList(TABLE_MENU_LIST_DATA);
 
         int totalTimeRequired= (int) (System.currentTimeMillis()-startTime);
 
@@ -116,6 +107,12 @@ public class DataDownWorker extends Worker {
         return Result.success();
     }
 
+
+
+
+
+
+
     private void getDataForMenuList(String tableName) {
         List<NameValuePair> params=new ArrayList<NameValuePair>();
         params.add(new BasicNameValuePair("role_code","SR"));
@@ -130,9 +127,18 @@ public class DataDownWorker extends Worker {
         Uri uri=DataContract.getUri(tableName);
         HashMap<String,String> tableData=new DataSyncModel(contentResolver).getUniqueColumn(uri,"column_id","");
 
-        insert(tableData,hashMap,uri,tableName);
+
+        insertFinal(tableData,hashMap,uri,tableName);
 
     }
+
+
+
+
+
+
+
+
 
     private void dataDown(String tableName) {
         String url=getApplicationContext().getString(R.string.GET_TEST_DATA_URL);
@@ -151,22 +157,11 @@ public class DataDownWorker extends Worker {
 
         insertFinal(tableData,values,uri,tableName);
 
-
-//        for (String key : values.keySet()) {
-//            if (!tableData.containsKey(key)) {
-//                ContentValues value = values.get(key);
-//
-//                boolean isInsert=insert(value);
-//                //Uri insertUri = contentResolver.insert(uri, value);
-//
-//                Log.d("MIS", uri.getPath()+key);
-//            } else {
-//                Log.e("MIS" + key, ":Already Exist");
-//            }
-//        }
-
-
     }
+
+
+
+
     public void insert(HashMap<String,String> tableData,HashMap<String,ContentValues> values,Uri uri,String tableName) {
         SQLiteDatabase db = dbHandler.getWritableDatabase();
         boolean wasSuccess = true;
@@ -193,43 +188,54 @@ public class DataDownWorker extends Worker {
 
     }
 
+
+
+
+
+
+
     public void insertFinal(HashMap<String,String> tableData,HashMap<String,ContentValues> values,Uri uri,String tableName) {
         SQLiteDatabase db = dbHandler.getWritableDatabase();
-        Log.e("sqliteData",String.valueOf(tableData.size()));
-        Log.e("BackendData",String.valueOf(values.size()));
 
-        boolean wasSuccess = true;
+        int sqliteDataSize=tableData.size();
+        int backendDataSize=values.size();
+
+        Log.e("sqliteData",String.valueOf(sqliteDataSize));
+        Log.e("BackendData",String.valueOf(backendDataSize));
+
+
         try {
             db.beginTransaction();
-            int i=1;
 
-            if(Integer.valueOf(tableData.size())>=Integer.valueOf(values.size())){
-                for(String key: tableData.keySet()){
-                    if(values.containsKey(key)){
-                        //is_synced(1);
-                        Log.e("Sqlite1",key);
-                        Log.e("Data " + key, ": Already Exists");
-                    }else{
-                        //is_synced(0)
-                        Log.e("Sqlite2",key);
-                        Log.e("Data " + key, ": Already Exists");
-                    }
-                }
-            }else{
+
+
+            if((int)(tableData.size())>=(int)(values.size())){
+                db.execSQL("DROP TABLE IF EXISTS "+tableName);
+                int i=0;
                 for(String key: values.keySet()){
-                    if(tableData.containsKey(key)){
-                      //is_synced(1);
-                        Log.e("Data " + key, ": Already Exists");
-                        Log.e("Sqlite3",key);
+                    if(!tableData.containsKey(key)){
+                        ContentValues value = values.get(key);
+                        long result=db.insert(tableName,null,value);
+                        Log.d("INSERTED ",uri.getPath()+key+" index / "+i);
                         i++;
 
                     }else{
+                        Log.e("MIS","Data already Exist / "+i);
+                        i++;
+                    }
+                }
+            }
+            if((int)tableData.size()<(int)values.size()){
+                int i=0;
+                for(String key: values.keySet()){
+                    if(tableData.containsKey(key)){
+                        Log.e("Data " + key, ": Already Exists /"+i);
+                        i++;
+                    }else{
                         ContentValues value = values.get(key);
                         long result=db.insert(tableName,null,value);
-                        Log.d("INSERTED ",uri.getPath()+key+" index "+i);
-                        Log.e("Sqlite4",key);
-
-                        //is_synced(1);
+                        Log.d("INSERTED ",uri.getPath()+key+" index / "+i);
+                        i++;
                     }
                 }
             }
@@ -239,8 +245,31 @@ public class DataDownWorker extends Worker {
             db.endTransaction();
             db.close();
         }
-
     }
+
+
+
+
+
+
+    private void is_synced(HashMap<String, String> sqliteData, HashMap<String,ContentValues>responseData,int i) {
+
+        String[] selectionArgs={sqliteData.keySet().toString()};
+        String selectionClause=DataContract.SalesEntry.SALES_ORDER_ID+" = ?";
+        SQLiteDatabase db=dbHandler.getWritableDatabase();
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(DataContract.MenuListEntry.IS_SYNCED, i);
+
+
+        int rowId=db.update(DataContract.SalesEntry.TABLE_NAME, contentValues, selectionClause, selectionArgs);
+        Log.e("Row Id",String.valueOf(rowId));
+    }
+
+
+
+
+
 
 
     /*Displaying a simple notification while task is done*/
@@ -261,16 +290,15 @@ public class DataDownWorker extends Worker {
 
     }
 
+
+
+
     //This method is responsible for returning back the context
     public Context getContext() {
         return mContext;
     }
 
 
-    //after parsing the sync_data_down.xml file we download the data from
-    //that api using this method first we collect the partial api
-    //then we write the code for completing the api and then we get the
-    //data from the server
     public ArrayList<String> downloadAllTableDataFromServer(){
         String service="all";
 
@@ -279,7 +307,6 @@ public class DataDownWorker extends Worker {
         //Parsing the sync_data_down.xml file for collecting the api
         dataServices=new DataServices(getApplicationContext());
         ArrayList<DataSync> downServices=dataServices.dataDownServices();
-
 
         ArrayList<String> allData=new ArrayList<>();
 
@@ -331,6 +358,9 @@ public class DataDownWorker extends Worker {
         //Log.e("allData",new Gson().toJson(allData));
         return allData;
     }
+
+
+
 
 
 }

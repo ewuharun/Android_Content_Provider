@@ -48,6 +48,7 @@ public class DataContract {
         public static final String ORDER_DATE="order_date";
         public static final String ORDER_DATE_TIME="order_date_time";
         public static final String DELIVERY_DATE="delivery_date";
+        public static final String IS_SYNCED="is_synced";
     }
 
     public static class MenuListEntry implements BaseColumns{

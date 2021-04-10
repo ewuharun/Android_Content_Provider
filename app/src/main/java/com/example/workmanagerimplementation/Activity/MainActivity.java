@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
         mainMenuModel.sort(mainMenuArrayList);
 
 
-        Log.e("ArrayList",new Gson().toJson(mainMenuArrayList));
+        Log.e("ALLItem",new Gson().toJson(mainMenuModel.readAllItems()));
 
         gridViewAdapter=new GridViewAdapter(getApplicationContext(),mainMenuArrayList);
         gridView.setAdapter(gridViewAdapter);
