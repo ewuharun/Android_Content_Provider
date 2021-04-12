@@ -2,11 +2,9 @@ package com.example.workmanagerimplementation.SyncUtils.BackgroundWorkers;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Build;
@@ -18,30 +16,24 @@ import androidx.work.Data;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
-import com.example.workmanagerimplementation.Activity.LoginActivity;
 import com.example.workmanagerimplementation.R;
 import com.example.workmanagerimplementation.SyncUtils.HelperUtils.DataServices;
 import com.example.workmanagerimplementation.SyncUtils.HelperUtils.DataSyncModel;
 import com.example.workmanagerimplementation.SyncUtils.HelperUtils.JsonParser;
-import com.example.workmanagerimplementation.SyncUtils.HelperUtils.NetworkStream;
+import com.example.workmanagerimplementation.NetWorkUtils.NetworkStream;
 import com.example.workmanagerimplementation.SyncUtils.HelperUtils.DataSync;
 import com.example.workmanagerimplementation.data.DBHandler;
 import com.example.workmanagerimplementation.data.DataContract;
-import com.google.android.material.badge.BadgeDrawable;
 import com.google.gson.Gson;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
-
-import retrofit2.http.Url;
 
 /**
  * Created by Md.harun or rashid on 21,March,2021
@@ -54,8 +46,7 @@ public class DataDownWorker extends Worker {
     private ContentResolver contentResolver;
     private DataServices dataServices;
     private ArrayList<String> allData;
-    DBHandler dbHandler;
-
+    private DBHandler dbHandler;
 
     //a public static string that will be used as the key
     //for sending and receiving data
@@ -65,7 +56,7 @@ public class DataDownWorker extends Worker {
     public DataDownWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
         this.contentResolver=context.getContentResolver();
-        this.dbHandler=new DBHandler(context);
+
     }
 
     @NonNull
@@ -74,6 +65,7 @@ public class DataDownWorker extends Worker {
 
         //getting the input data
         String taskDesc=getInputData().getString(TASK_DESC);
+
         displayNotification("Worker",taskDesc);
 
         int startTime= (int) System.currentTimeMillis();
@@ -83,7 +75,7 @@ public class DataDownWorker extends Worker {
 
         //allData=downloadAllTableDataFromServer();
 
-        dataDown(TABLE_TEST_DATA);
+        //dataDown(TABLE_TEST_DATA);
         getDataForMenuList(TABLE_MENU_LIST_DATA);
 
         int totalTimeRequired= (int) (System.currentTimeMillis()-startTime);
@@ -163,8 +155,8 @@ public class DataDownWorker extends Worker {
 
 
     public void insert(HashMap<String,String> tableData,HashMap<String,ContentValues> values,Uri uri,String tableName) {
-        SQLiteDatabase db = dbHandler.getWritableDatabase();
-        boolean wasSuccess = true;
+        dbHandler=new DBHandler(getApplicationContext());
+        SQLiteDatabase db=dbHandler.getWritableDatabase();
         try {
             db.beginTransaction();
             int i=1;
@@ -195,6 +187,7 @@ public class DataDownWorker extends Worker {
 
 
     public void insertFinal(HashMap<String,String> tableData,HashMap<String,ContentValues> values,Uri uri,String tableName) {
+        dbHandler=new DBHandler(getApplicationContext());
         SQLiteDatabase db = dbHandler.getWritableDatabase();
 
         int sqliteDataSize=tableData.size();
@@ -207,38 +200,19 @@ public class DataDownWorker extends Worker {
         try {
             db.beginTransaction();
 
+                        db.delete(tableName,null,null);
+
+                        for(String key: values.keySet()){
+                            ContentValues value = values.get(key);
+                            long result=db.insert(tableName,null,value);
+                            Log.d("INSERTED ",uri.getPath()+values.keySet()+" index / ");
+                        }
 
 
-            if((int)(tableData.size())>=(int)(values.size())){
-                db.execSQL("DROP TABLE IF EXISTS "+tableName);
-                int i=0;
-                for(String key: values.keySet()){
-                    if(!tableData.containsKey(key)){
-                        ContentValues value = values.get(key);
-                        long result=db.insert(tableName,null,value);
-                        Log.d("INSERTED ",uri.getPath()+key+" index / "+i);
-                        i++;
 
-                    }else{
-                        Log.e("MIS","Data already Exist / "+i);
-                        i++;
-                    }
-                }
-            }
-            if((int)tableData.size()<(int)values.size()){
-                int i=0;
-                for(String key: values.keySet()){
-                    if(tableData.containsKey(key)){
-                        Log.e("Data " + key, ": Already Exists /"+i);
-                        i++;
-                    }else{
-                        ContentValues value = values.get(key);
-                        long result=db.insert(tableName,null,value);
-                        Log.d("INSERTED ",uri.getPath()+key+" index / "+i);
-                        i++;
-                    }
-                }
-            }
+
+
+
             db.setTransactionSuccessful();
 
         } finally {

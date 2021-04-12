@@ -1,11 +1,7 @@
 package com.example.workmanagerimplementation.data;
 
-import android.icu.lang.UProperty;
 import android.net.Uri;
 import android.provider.BaseColumns;
-
-import java.net.PortUnreachableException;
-import java.security.PublicKey;
 
 /**
  * Created by Md.harun or rashid on 21,March,2021

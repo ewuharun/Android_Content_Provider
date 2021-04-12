@@ -4,7 +4,6 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
-import android.util.Pair;
 
 import androidx.annotation.NonNull;
 import androidx.work.Data;
@@ -17,7 +16,7 @@ import com.example.workmanagerimplementation.SyncUtils.HelperUtils.DataSync;
 import com.example.workmanagerimplementation.SyncUtils.HelperUtils.DataSyncModel;
 import com.example.workmanagerimplementation.SyncUtils.HelperUtils.JsonParser;
 import com.example.workmanagerimplementation.SyncUtils.HelperUtils.Maths;
-import com.example.workmanagerimplementation.SyncUtils.HelperUtils.NetworkStream;
+import com.example.workmanagerimplementation.NetWorkUtils.NetworkStream;
 import com.example.workmanagerimplementation.data.DataContract;
 import com.google.gson.Gson;
 

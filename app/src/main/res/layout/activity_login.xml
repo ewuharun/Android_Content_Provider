@@ -5,17 +5,169 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="#F7F9F9"
+    android:weightSum="1"
     tools:context=".Activity.LoginActivity">
 
-    <TextView
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Login Activity"/>
+        android:id="@+id/backgroundLayout"
+        android:layout_weight="1"
+        android:layout_height="match_parent">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:id="@+id/CompanyColor">
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:id="@+id/CompanyLogo"
+                android:src="@drawable/ic_launcher_background"
+                android:layout_marginTop="50dp"
+                android:layout_centerHorizontal="true"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_below="@id/CompanyLogo"
+                android:layout_marginTop="5dp"
+                android:text="SahCement"
+                android:gravity="center"
+                android:textSize="24sp"
+                android:textColor="@color/white"
+                android:id="@+id/CompanyName"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_below="@id/CompanyLogo"
+                android:layout_marginTop="40dp"
+                android:text="SahCement"
+                android:gravity="center"
+                android:textSize="24sp"
+                android:textColor="@color/white"
+                android:id="@+id/CompanyTitle"/>
+        </RelativeLayout>
 
-    <Button
-        android:layout_width="match_parent"
-        android:text="Login"
-        android:id="@+id/loginBtn"
-        android:layout_height="wrap_content"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_marginTop="250dp"
+            android:id="@+id/card"
+            android:layout_height="250dp">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                app:cardCornerRadius="8dp"
+                android:layout_height="match_parent"
+                android:elevation="10dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:orientation="vertical"
+                    android:id="@+id/editTextField"
+                    android:layout_height="wrap_content">
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:hint="Username"
+                        app:errorEnabled="true"
+                        android:id="@+id/usernameInputLayout"
+                        android:layout_height="wrap_content">
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:layout_width="match_parent"
+                            android:layout_marginTop="50dp"
+                            android:layout_margin="20dp"
+                            android:id="@+id/userNameEt"
+                            android:inputType="text"
+                            android:layout_height="wrap_content">
+                        </com.google.android.material.textfield.TextInputEditText>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:hint="Password"
+                        app:errorEnabled="true"
+                        android:id="@+id/passwordInputLayout"
+                        android:layout_height="wrap_content">
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:layout_width="match_parent"
+                            android:layout_marginTop="5dp"
+                            android:inputType="textPassword"
+                            android:id="@+id/passwordEt"
+                            android:layout_marginLeft="20dp"
+                            android:layout_marginRight="20dp"
+                            android:layout_height="wrap_content">
+                        </com.google.android.material.textfield.TextInputEditText>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_marginTop="10dp"
+                        android:layout_height="wrap_content">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/loginBtn"
+                            android:layout_width="wrap_content"
+                            android:layout_marginRight="80dp"
+                            android:layout_height="wrap_content"
+                            style="@style/Widget.MaterialComponents.Button.TextButton"
+                            android:layout_alignParentEnd="true"
+                            android:textColor="@color/black"
+                            android:layout_alignParentRight="true"
+                            android:text="Login" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/exitBtn"
+                            style="@style/Widget.MaterialComponents.Button.TextButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="80dp"
+
+                            android:text="Exit" />
+
+                    </RelativeLayout>
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+        </RelativeLayout>
+    </RelativeLayout>
+
+
+
+   <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:orientation="horizontal"
+       android:weightSum="1"
+
+       android:layout_gravity="center"
+       android:layout_weight=".2">
+       <TextView
+           android:layout_width="0dp"
+           android:text="A product of business Accelerate bd ltd"
+           android:gravity="center"
+           android:layout_gravity="center"
+           android:textSize="15sp"
+           android:id="@+id/bablTitle"
+           android:layout_weight="1"
+           android:layout_marginLeft="5dp"
+           android:layout_below="@+id/card"
+           android:textColor="@color/black"
+           android:layout_height="wrap_content">
+       </TextView>
+       <ImageView
+           android:layout_width="30dp"
+           android:layout_weight=".8"
+           android:layout_gravity="center"
+           android:id="@+id/bablLogo"
+           android:layout_margin="10dp"
+           android:src="@drawable/ic_launcher_background"
+           android:layout_height="30dp">
+
+       </ImageView>
+   </LinearLayout>
 
 </LinearLayout>

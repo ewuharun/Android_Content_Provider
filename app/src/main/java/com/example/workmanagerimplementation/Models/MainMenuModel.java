@@ -2,7 +2,6 @@ package com.example.workmanagerimplementation.Models;
 
 import android.content.ContentResolver;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.example.workmanagerimplementation.Models.Pojo.MainMenu;
@@ -46,7 +45,6 @@ public class MainMenuModel{
 
         Cursor cursor=contentResolver.query(DataContract.MenuListEntry.CONTENT_URI,projection,selectionClause,selctionArgs,null);
         Log.e("Cursor",new Gson().toJson(cursor));
-
         if(cursor.moveToFirst()){
             do {
                 Log.e("FirstCursor",cursor.getString(0));
@@ -56,6 +54,7 @@ public class MainMenuModel{
                 mainMenuArrayList.add(new MainMenu(cursor.getString(2),cursor.getString(0),cursor.getInt(1),cursor.getInt(3)));
             }while (cursor.moveToNext());
         }
+
 
         return mainMenuArrayList;
     }

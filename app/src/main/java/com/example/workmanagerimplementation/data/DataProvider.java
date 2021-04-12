@@ -10,7 +10,6 @@ import android.net.Uri;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.work.Data;
 
 /**
  * Created by Md.harun or rashid on 21,March,2021

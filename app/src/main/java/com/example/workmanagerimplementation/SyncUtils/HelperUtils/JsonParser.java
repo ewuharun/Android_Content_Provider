@@ -3,7 +3,10 @@ package com.example.workmanagerimplementation.SyncUtils.HelperUtils;
 import android.content.ContentValues;
 import android.util.Log;
 
+import com.example.workmanagerimplementation.R;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
@@ -42,6 +45,42 @@ public class JsonParser {
 
 
 
+    public static  HashMap<String, String> getAssetData(String data){
+        HashMap<String,String> dataMap=new HashMap<>();
+        if(data!=null){
+            try{
+                JSONObject jsonObject=new JSONObject(data);
+                JSONArray jsonArray=jsonObject.getJSONObject("Login_Info_Data").getJSONArray("data");
+                Log.v("Data Row Length : ", " : " + jsonArray.length());
+
+                for(int i=0;i<jsonArray.length();++i){
+                    JSONObject dataRows=jsonArray.getJSONObject(i);
+
+                    Iterator iterator=dataRows.keys();
+
+                    String val = null;
+
+                    for(int k=0;iterator.hasNext();k++){
+                        String column_name=iterator.next().toString();
+                        String column_value=dataRows.getString(column_name);
+                        Log.e("content",column_value);
+                        val=column_value;
+                        dataMap.put(column_name,column_value);
+                    }
+
+                }
+
+
+
+            }catch (JSONException jsonException){
+                jsonException.printStackTrace();
+            }
+        }
+
+        Log.e("DataHas",new Gson().toJson(dataMap));
+
+        return dataMap;
+    }
 
 
 

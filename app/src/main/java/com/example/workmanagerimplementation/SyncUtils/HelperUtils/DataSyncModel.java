@@ -5,8 +5,8 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
-import android.util.Pair;
 
+import com.example.workmanagerimplementation.SyncUtils.HelperUtils.DataSync;
 import com.google.gson.Gson;
 
 import org.apache.http.NameValuePair;

@@ -1,11 +1,9 @@
 package com.example.workmanagerimplementation.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.view.menu.MenuView;
 import androidx.lifecycle.Observer;
 import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
-import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
@@ -17,7 +15,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,20 +22,14 @@ import android.widget.Toast;
 import com.example.workmanagerimplementation.Adapter.GridViewAdapter;
 import com.example.workmanagerimplementation.Models.EmployeeModel;
 import com.example.workmanagerimplementation.Models.MainMenuModel;
-import com.example.workmanagerimplementation.Models.Pojo.Employee;
 import com.example.workmanagerimplementation.Models.Pojo.MainMenu;
-import com.example.workmanagerimplementation.Models.Pojo.Sales;
-import com.example.workmanagerimplementation.Models.SalesModel;
 import com.example.workmanagerimplementation.R;
 import com.example.workmanagerimplementation.SyncUtils.BackgroundWorkers.DataDownWorker;
-import com.example.workmanagerimplementation.SyncUtils.BackgroundWorkers.DataUpWorker;
 import com.example.workmanagerimplementation.data.DBHandler;
-import com.google.android.material.timepicker.TimeFormat;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
     private Button logoutBtn;
@@ -55,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         dbHandler=new DBHandler(getApplicationContext());
         db=dbHandler.getWritableDatabase();
         dbHandler.createTable(db);
@@ -71,32 +63,9 @@ public class MainActivity extends AppCompatActivity {
 
         initVariables();
         SyncData();
-        MainMenuModel mainMenuModel=new MainMenuModel(getContentResolver());
-
-        ArrayList<MainMenu> mainMenuArrayList=new ArrayList<MainMenu>();
-
-        mainMenuArrayList=mainMenuModel.getAllMenuList("SR");
-
-        mainMenuModel.sort(mainMenuArrayList);
 
 
-        Log.e("ALLItem",new Gson().toJson(mainMenuModel.readAllItems()));
-
-        gridViewAdapter=new GridViewAdapter(getApplicationContext(),mainMenuArrayList);
-        gridView.setAdapter(gridViewAdapter);
-
-        menuAction(gridView);
-
-
-
-
-
-
-
-
-
-
-
+        loadData();
 
         logoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -108,6 +77,21 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void loadData(){
+        MainMenuModel mainMenuModel=new MainMenuModel(getContentResolver());
+        ArrayList<MainMenu> mainMenuArrayList=new ArrayList<MainMenu>();
+
+        mainMenuArrayList=mainMenuModel.getAllMenuList("SR");
+        mainMenuModel.sort(mainMenuArrayList);
+
+        Log.e("ALLItem",new Gson().toJson(mainMenuModel.readAllItems()));
+
+        gridViewAdapter=new GridViewAdapter(getApplicationContext(),mainMenuArrayList);
+        gridView.setAdapter(gridViewAdapter);
+
+        menuAction(gridView);
+    }
+
     private void menuAction(GridView gridView) {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -117,9 +101,9 @@ public class MainActivity extends AppCompatActivity {
 
 
                 //Toast.makeText(getApplicationContext(),mainMenu.getMenuTitle(), Toast.LENGTH_SHORT).show();
-                
+
                 String title=mainMenu.getMenuTitle();
-                
+
                 switch (title){
                     case "profile_icon":
                         Toast.makeText(MainActivity.this, "Profile Icon", Toast.LENGTH_SHORT).show();
@@ -163,6 +147,7 @@ public class MainActivity extends AppCompatActivity {
                         //Receiving the Data Back
                         if(workInfo!=null && workInfo.getState().isFinished()){
 
+                            loadData();
                             //workStatusTv.setText(workInfo.getOutputData().getString(DataDownWorker.TASK_DESC));
                             //Log.e("none",workInfo.getOutputData().getString(DataUpWorker.TASK_DESC));
                         }
@@ -185,4 +170,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    public void sync(View view) {
+        SyncData();
+    }
 }

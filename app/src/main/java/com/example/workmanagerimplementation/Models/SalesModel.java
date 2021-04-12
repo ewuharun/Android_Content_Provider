@@ -2,7 +2,6 @@ package com.example.workmanagerimplementation.Models;
 
 import android.content.ContentResolver;
 import android.database.Cursor;
-import android.provider.ContactsContract;
 import android.util.Log;
 
 import com.example.workmanagerimplementation.Models.Pojo.Sales;

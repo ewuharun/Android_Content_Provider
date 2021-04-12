@@ -38,6 +38,12 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:text="Sync Data"
+            android:onClick="sync"
+            android:id="@+id/syncBtn"/>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:text="Logout"
             android:textColor="@color/white"
             android:id="@+id/logoutBtn"/>
