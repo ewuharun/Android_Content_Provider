@@ -74,9 +74,10 @@ public class DataDownWorker extends Worker {
         String TABLE_MENU_LIST_DATA=getApplicationContext().getString(R.string.TBL_MENU_LIST_DATA);
 
         //allData=downloadAllTableDataFromServer();
-
-        //dataDown(TABLE_TEST_DATA);
         getDataForMenuList(TABLE_MENU_LIST_DATA);
+        dataDown(TABLE_TEST_DATA);
+
+
 
         int totalTimeRequired= (int) (System.currentTimeMillis()-startTime);
 
@@ -120,7 +121,7 @@ public class DataDownWorker extends Worker {
         HashMap<String,String> tableData=new DataSyncModel(contentResolver).getUniqueColumn(uri,"column_id","");
 
 
-        insertFinal(tableData,hashMap,uri,tableName);
+        insert(tableData,hashMap,uri,tableName);
 
     }
 
@@ -147,7 +148,7 @@ public class DataDownWorker extends Worker {
         //String sql = "INSERT INTO TBL_TODAYS_MIS_MERCHANDISING_FILTER_DATA (sales_order_id,so_oracle_id,dealer_name,name,order_date,order_date_time,delivery_date) VALUES (?,?,?,?,?,?,?)";
 
 
-        insertFinal(tableData,values,uri,tableName);
+        insert(tableData,values,uri,tableName);
 
     }
 
@@ -157,19 +158,20 @@ public class DataDownWorker extends Worker {
     public void insert(HashMap<String,String> tableData,HashMap<String,ContentValues> values,Uri uri,String tableName) {
         dbHandler=new DBHandler(getApplicationContext());
         SQLiteDatabase db=dbHandler.getWritableDatabase();
+        db.delete(tableName,null,null);
         try {
             db.beginTransaction();
             int i=1;
             for(String key: values.keySet()){
-                if(!tableData.containsKey(key)){
+//                if(!tableData.containsKey(key)){
                     ContentValues value = values.get(key);
                     long result=db.insert(tableName,null,value);
                     Log.d("MIS",uri.getPath()+key+" index "+i);
                     i++;
 
-                }else{
-                    Log.e("MIs" + key, ": Already Exists");
-                }
+//                }else{
+//                    Log.e("MIs" + key, ": Already Exists");
+//                }
             }
             db.setTransactionSuccessful();
 

@@ -78,6 +78,7 @@ public class LoginActivity extends AppCompatActivity {
             asset=new Asset();
             fetchAssetFromServer("Shah Cement Smart Sales",asset);
         }
+
         loginButtonClicked();
         exitButtonClicked();
 
@@ -115,20 +116,17 @@ public class LoginActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
-            private void isPermissionEnabled(String[] PERMISSIONS) {
-                int result = ContextCompat.checkSelfPermission(getApplicationContext(), String.valueOf(PERMISSIONS));
-            }
 
 
-            public void fetchAssetFromServer(String project_title, Asset asset) {
+    public void fetchAssetFromServer(String project_title, Asset asset) {
 
-                Data data = new Data.Builder()
+        Data data = new Data.Builder()
                         .putString(AssetDownloadWorker.TASK, project_title).build();
-                OneTimeWorkRequest assetDownloadRequest = new OneTimeWorkRequest.Builder(AssetDownloadWorker.class)
+        OneTimeWorkRequest assetDownloadRequest = new OneTimeWorkRequest.Builder(AssetDownloadWorker.class)
                         .setInputData(data)
                         .build();
-                WorkManager.getInstance().enqueue(assetDownloadRequest);
-                WorkManager.getInstance().getWorkInfoByIdLiveData(assetDownloadRequest.getId())
+        WorkManager.getInstance().enqueue(assetDownloadRequest);
+        WorkManager.getInstance().getWorkInfoByIdLiveData(assetDownloadRequest.getId())
                         .observe(LoginActivity.this, new Observer<WorkInfo>() {
                             @Override
                             public void onChanged(WorkInfo workInfo) {
@@ -151,25 +149,23 @@ public class LoginActivity extends AppCompatActivity {
                             }
                         });
 
-            }
+    }
+    private void loadData(String response, Asset asset) {
+        AssetModel assetModel = new AssetModel();
+        asset = assetModel.getAssetData(response);
+        setAssetToLoginView(asset);
+    }
 
-            private void loadData(String response, Asset asset) {
-                AssetModel assetModel = new AssetModel();
-                asset = assetModel.getAssetData(response);
-                setAssetToLoginView(asset);
+    private void setAssetToLoginView(Asset asset) {
+        ComapnyName.setText(asset.getCompanyName());
+        BablTitile.setText(asset.getBabl_title());
+        CompanyTitle.setText(asset.getProjectName());
 
-            }
+        Glide.with(LoginActivity.this).load(asset.getCompanyLogo()).into(CompanyLogo);
+        Glide.with(LoginActivity.this).load(asset.getBabl_logo()).into(BablLogo);
+        colorlayout.setBackgroundColor(Color.parseColor(asset.getColor()));
 
-            private void setAssetToLoginView(Asset asset) {
-                ComapnyName.setText(asset.getCompanyName());
-                BablTitile.setText(asset.getBabl_title());
-                CompanyTitle.setText(asset.getProjectName());
-
-                Glide.with(LoginActivity.this).load(asset.getCompanyLogo()).into(CompanyLogo);
-                Glide.with(LoginActivity.this).load(asset.getBabl_logo()).into(BablLogo);
-                colorlayout.setBackgroundColor(Color.parseColor(asset.getColor()));
-
-            }
+    }
 
 
             private boolean gettingInputTextValue() {

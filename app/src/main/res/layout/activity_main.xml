@@ -88,12 +88,6 @@
             android:textColor="@color/black"
             android:id="@+id/workStatusTv"/>
 
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Logout"
-            android:textColor="@color/white"
-            android:id="@+id/logoutBtn"/>
 
         <GridView
             android:layout_width="match_parent"

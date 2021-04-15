@@ -58,25 +58,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        dbHandler=new DBHandler(getApplicationContext());
+        db=dbHandler.getWritableDatabase();
+        dbHandler.createTable(db);
+
         initVariables();
         loadData();
         syncButtonClicked();
-        logoutBtnClicked();
+
 
 
     }
 
-    private void logoutBtnClicked() {
-        logoutBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sessionManager.delteSession();
-                Intent intent=new Intent(MainActivity.this,LoginActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        });
-    }
+
 
     private void syncButtonClicked() {
         startSyncBtn.setOnClickListener(new View.OnClickListener() {
@@ -85,10 +79,10 @@ public class MainActivity extends AppCompatActivity {
                 progressBar.setVisibility(View.VISIBLE);
                 startSyncBtn.setVisibility(View.GONE);
 
-                dbHandler=new DBHandler(getApplicationContext());
-                db=dbHandler.getWritableDatabase();
-                dbHandler.createTable(db);
+
                 SyncData();
+                onStart();
+
             }
         });
     }
@@ -127,8 +121,16 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(MainActivity.this, "Verify_Retailer", Toast.LENGTH_SHORT).show();
                         break;
                     case "todays_route":
-                        Intent intent=new Intent(MainActivity.this,TodaysRouteActivity.class);
-                        startActivity(intent);
+                        Intent todaysIntent=new Intent(MainActivity.this,TodaysRouteActivity.class);
+                        startActivity(todaysIntent);
+                        break;
+                    case "logout":
+                        sessionManager.delteSession();
+                        Intent logout=new Intent(MainActivity.this,LoginActivity.class);
+                        startActivity(logout);
+                        finish();
+                        break;
+
                     default:
                         Toast.makeText(MainActivity.this, "Default", Toast.LENGTH_SHORT).show();
                         break;
@@ -185,13 +187,8 @@ public class MainActivity extends AppCompatActivity {
         workStatusTv=(TextView) findViewById(R.id.workStatusTv);
         sessionManager=new SessionManager(getApplicationContext());
         gridView=findViewById(R.id.gridView);
-        logoutBtn=(Button) findViewById(R.id.logoutBtn);
+
         startSyncBtn=findViewById(R.id.startSyncBtn);
         progressBar=findViewById(R.id.progresBtn);
-    }
-
-
-    public void sync(View view) {
-        SyncData();
     }
 }
