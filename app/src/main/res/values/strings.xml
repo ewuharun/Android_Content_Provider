@@ -8,5 +8,5 @@
     <string name="PROJECT_TITLE">prject_title</string>
     <string name="TBL_LOGIN_INFO_DATA">Login_Info_Data</string>
     <string name="ASSET_URL">http://120.50.42.151/mobile_api/api/Merchandising/getLoginInfo</string>
-    
+
 </resources>

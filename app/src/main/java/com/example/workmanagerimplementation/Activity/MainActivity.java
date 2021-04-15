@@ -1,6 +1,8 @@
 package com.example.workmanagerimplementation.Activity;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
 import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
@@ -10,12 +12,15 @@ import androidx.work.WorkManager;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,12 +29,15 @@ import com.example.workmanagerimplementation.Models.EmployeeModel;
 import com.example.workmanagerimplementation.Models.MainMenuModel;
 import com.example.workmanagerimplementation.Models.Pojo.MainMenu;
 import com.example.workmanagerimplementation.R;
+import com.example.workmanagerimplementation.Session.SessionManager;
 import com.example.workmanagerimplementation.SyncUtils.BackgroundWorkers.DataDownWorker;
 import com.example.workmanagerimplementation.data.DBHandler;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Date;
+
+import static com.example.workmanagerimplementation.R.id.startSyncBtn;
 
 public class MainActivity extends AppCompatActivity {
     private Button logoutBtn;
@@ -40,39 +48,47 @@ public class MainActivity extends AppCompatActivity {
     private EmployeeModel employeeModel;
     private GridView gridView;
     private GridViewAdapter gridViewAdapter;
+    private TextView startSyncBtn;
+    private ProgressBar progressBar;
 
+    SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        dbHandler=new DBHandler(getApplicationContext());
-        db=dbHandler.getWritableDatabase();
-        dbHandler.createTable(db);
-
-        //creating constraints
-//        Constraints constraints = new Constraints.Builder()
-//                .setRequiresCharging(true) // you can add as many constraints as you want
-//                .build();
-
-
-        //this is the subclass of periodic work request
-//        final PeriodicWorkRequest workRequest=new PeriodicWorkRequest.Builder(DataUpWorker.class,16, TimeUnit.MINUTES).build();
-
-
         initVariables();
-        SyncData();
-
-
         loadData();
+        syncButtonClicked();
+        logoutBtnClicked();
 
+
+    }
+
+    private void logoutBtnClicked() {
         logoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                sessionManager.delteSession();
                 Intent intent=new Intent(MainActivity.this,LoginActivity.class);
                 startActivity(intent);
                 finish();
+            }
+        });
+    }
+
+    private void syncButtonClicked() {
+        startSyncBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                progressBar.setVisibility(View.VISIBLE);
+                startSyncBtn.setVisibility(View.GONE);
+
+                dbHandler=new DBHandler(getApplicationContext());
+                db=dbHandler.getWritableDatabase();
+                dbHandler.createTable(db);
+                SyncData();
             }
         });
     }
@@ -88,7 +104,6 @@ public class MainActivity extends AppCompatActivity {
 
         gridViewAdapter=new GridViewAdapter(getApplicationContext(),mainMenuArrayList);
         gridView.setAdapter(gridViewAdapter);
-
         menuAction(gridView);
     }
 
@@ -111,6 +126,9 @@ public class MainActivity extends AppCompatActivity {
                     case  "verify_retailer":
                         Toast.makeText(MainActivity.this, "Verify_Retailer", Toast.LENGTH_SHORT).show();
                         break;
+                    case "todays_route":
+                        Intent intent=new Intent(MainActivity.this,TodaysRouteActivity.class);
+                        startActivity(intent);
                     default:
                         Toast.makeText(MainActivity.this, "Default", Toast.LENGTH_SHORT).show();
                         break;
@@ -139,6 +157,8 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(MainActivity.this, "Running", Toast.LENGTH_SHORT).show();
                         }
                         if (workInfo.getState()==WorkInfo.State.SUCCEEDED){
+                            startSyncBtn.setVisibility(View.VISIBLE);
+                            progressBar.setVisibility(View.GONE);
                             Log.e("EndTime",String.valueOf(new Date().getTime()));
                         }
 
@@ -151,7 +171,6 @@ public class MainActivity extends AppCompatActivity {
                             //workStatusTv.setText(workInfo.getOutputData().getString(DataDownWorker.TASK_DESC));
                             //Log.e("none",workInfo.getOutputData().getString(DataUpWorker.TASK_DESC));
                         }
-
                     }
                 });
     }
@@ -159,14 +178,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        Toast.makeText(this, "MainActi", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "MainActivity", Toast.LENGTH_SHORT).show();
     }
 
     private void initVariables() {
         workStatusTv=(TextView) findViewById(R.id.workStatusTv);
-
+        sessionManager=new SessionManager(getApplicationContext());
         gridView=findViewById(R.id.gridView);
         logoutBtn=(Button) findViewById(R.id.logoutBtn);
+        startSyncBtn=findViewById(R.id.startSyncBtn);
+        progressBar=findViewById(R.id.progresBtn);
     }
 
 
